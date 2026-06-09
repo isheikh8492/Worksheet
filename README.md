@@ -280,6 +280,7 @@ The profile tests print metrics for review and comparison. They are intentionall
 | CHASM pipeline | `ChasmPipelineProfileTests` | produced events/sec, captured events/sec, dropped batches/events, captured MiB/sec | How fast the producer/channel/consumer/source path can move events end to end |
 | Plot processing | `ProcessingProfileTests` | full rebuild time, delta processing time, events/sec | Whether plot processors are rebuilding whole windows or applying incremental updates efficiently |
 | Plot rendering | `RenderingProfileTests` | average render ms, renders/sec | How expensive each `PlotView.Render(...)` path is, including bitmap and oscilloscope signal rendering |
+| Live worksheet pipeline | `WorksheetLivePipelineProfileTests` | event rate, buffered events, average compute/render ms, delta/full/gap counts | What the app's Processing Status panel reports through the real `ViewportSession` path |
 | DPI/render target sizing | `DpiAwarenessTests` | expected physical pixel dimensions | Whether WPF device-independent sizes map correctly to bitmap pixel buffers |
 | Oscilloscope processing | `ProcessingEngineOscilloscopeTests`, `OscilloscopePlotProcessorTests` | selected channel extraction, latest-capture behavior, cadence separation | Whether waveform processing follows oscilloscope buffer updates independently from parameter plots |
 
@@ -293,7 +294,44 @@ Useful numbers to compare between runs:
 - `delta applied count`: number of times processors updated only from new event ranges.
 - `average render ms`: UI-thread render method cost per plot type.
 
-Sample local profile run from June 9, 2026:
+### Live Worksheet Profile
+
+This is the representative profile for comparing against the app's Processing
+Status panel. It creates a real `ViewportSession`, registers histogram,
+pseudocolor, spectral ribbon, and oscilloscope render targets, starts
+`ChasmOptions.Balanced50k`, pumps the WPF dispatcher, and reads
+`ViewportSession.GetProcessingStatusSnapshot()`.
+
+Sample local live worksheet profile from June 9, 2026:
+
+| Metric | Measured result |
+| --- | --- |
+| Event rate | final `31,810 ev/s`, sampled average `31,982 ev/s` |
+| Buffered events | `200,000` |
+| Histogram average compute | `0.73 ms` |
+| Pseudocolor average compute | `2.31 ms` |
+| Spectral ribbon average compute | `15.38 ms` |
+| Oscilloscope average compute | `0.02 ms` |
+| Histogram average render | `0.64 ms` |
+| Pseudocolor average render | `0.06 ms` |
+| Spectral ribbon average render | `0.14 ms` |
+| Oscilloscope average render | `0.03 ms` |
+| Incremental processing | `637,000` delta events, `3` full rebuilds, `0` sequence gaps |
+
+```powershell
+dotnet test .\Worksheet.Tests\Worksheet.Tests.csproj --no-restore --filter "FullyQualifiedName~WorksheetLivePipelineProfileTests" --logger "console;verbosity=normal"
+```
+
+### Microbenchmarks
+
+Sample local microbenchmark profile run from June 9, 2026:
+
+These numbers are offline profile-test samples, not the same measurement as the
+live Processing Status panel. The sidebar reports the currently running app:
+configured producer cadence, current retained window size, current plot set,
+actual plot dimensions, UI-thread rendering, and steady-state incremental
+processing. The profile tests isolate specific paths and may use different
+layouts, prebuilt batches, full rebuilds, delta updates, or render targets.
 
 | Area | Scenario | Measured result |
 | --- | --- | --- |
