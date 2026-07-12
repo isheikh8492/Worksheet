@@ -33,17 +33,17 @@ namespace Worksheet.Services
         {
             try
             {
-                return settings.PlotType switch
+                return settings switch
                 {
-                    PlotType.Histogram => ProcessHistogram(settings),
-                    PlotType.Pseudocolor => ProcessHeatmap(settings, targetSize),
-                    PlotType.SpectralRibbon => ProcessSpectralRibbon(settings, targetSize),
-                    _ => throw new ArgumentOutOfRangeException(nameof(settings.PlotType), settings.PlotType, "Unsupported plot type.")
+                    HistogramSettings histogram => ProcessHistogram(histogram),
+                    PseudocolorSettings pseudocolor => ProcessHeatmap(pseudocolor, targetSize),
+                    SpectralRibbonSettings spectral => ProcessSpectralRibbon(spectral, targetSize),
+                    _ => throw new ArgumentOutOfRangeException(nameof(settings), settings.PlotType, "Unsupported plot type.")
                 };
             }
             catch (Exception ex)
             {
-                AppLog.Exception(ex, $"PlotProcessor.Process plotType={settings.PlotType} plotId={settings.Id} x={settings.XFeature} y={settings.YFeature}");
+                AppLog.Exception(ex, $"PlotProcessor.Process plotType={settings.PlotType} plotId={settings.Id}");
                 return null;
             }
         }
@@ -74,7 +74,7 @@ namespace Worksheet.Services
         }
 
         private static (double scale, double offset, bool isLog, double effMin, double effMax) BuildBinTransform(
-            PlotSettings settings, AxisScaleType scaleType)
+            ParameterPlotSettings settings, AxisScaleType scaleType)
         {
             double min = settings.MinValue;
             double max = settings.MaxValue;
@@ -107,7 +107,7 @@ namespace Worksheet.Services
             return Math.Clamp((int)pos, 0, bins - 1);
         }
 
-        private ProcessedPlotData ProcessHistogram(PlotSettings settings)
+        private ProcessedPlotData ProcessHistogram(HistogramSettings settings)
         {
             ChannelWindowSnapshot snapshot = _buffer.GetSnapshot(settings.XFeature);
             int bins = settings.GetBinCount();
@@ -220,7 +220,7 @@ namespace Worksheet.Services
             }
         }
 
-        private ProcessedPlotData ProcessHeatmap(PlotSettings settings, RenderTargetSize targetSize)
+        private ProcessedPlotData ProcessHeatmap(PseudocolorSettings settings, RenderTargetSize targetSize)
         {
             MultiChannelWindowSnapshot snapshot = _buffer.GetSnapshot(settings.XFeature, settings.YFeature);
             int bins = settings.GetBinCount();
@@ -391,7 +391,7 @@ namespace Worksheet.Services
             }
         }
 
-        private ProcessedPlotData ProcessSpectralRibbon(PlotSettings settings, RenderTargetSize targetSize)
+        private ProcessedPlotData ProcessSpectralRibbon(SpectralRibbonSettings settings, RenderTargetSize targetSize)
         {
             var channelIndices = FeatureSelectionStrategy.FilteredChannelIndices;
             int channelCount = channelIndices.Count;

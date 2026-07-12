@@ -25,10 +25,13 @@ namespace Worksheet.Services
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            if (!_buffer.TryGetLatest(out var capture) || capture == null)
-                return Empty(settings.Id);
+            if (settings is not ScopeSettings scopeSettings)
+                throw new ArgumentException($"Expected {nameof(ScopeSettings)} but received {settings.GetType().Name}.", nameof(settings));
 
-            var requestedChannels = settings.OscilloscopeChannelIndices;
+            if (!_buffer.TryGetLatest(out var capture) || capture == null)
+                return Empty(scopeSettings.Id);
+
+            var requestedChannels = scopeSettings.ChannelIndices;
             if (requestedChannels == null || requestedChannels.Length == 0)
                 requestedChannels = DefaultChannelSelection;
 
@@ -40,7 +43,7 @@ namespace Worksheet.Services
             }
 
             if (validChannels.Count == 0)
-                return Empty(settings.Id);
+                return Empty(scopeSettings.Id);
 
             var signals = new double[validChannels.Count][];
             for (int i = 0; i < validChannels.Count; i++)
@@ -57,7 +60,7 @@ namespace Worksheet.Services
             }
 
             return new OscilloscopeProcessedData(
-                settings.Id,
+                scopeSettings.Id,
                 signals,
                 validChannels.ToArray(),
                 capture.TimestampCount,

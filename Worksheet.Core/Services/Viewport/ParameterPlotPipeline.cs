@@ -27,13 +27,30 @@ namespace Worksheet.Services
         public int GetSettingsHash(PlotSettings settings, RenderTargetSize targetSize)
         {
             var hash = new HashCode();
-            hash.Add(settings.GetBinCount());
-            hash.Add(settings.XFeature);
-            hash.Add(settings.YFeature);
-            hash.Add(settings.XAxisScaleType);
-            hash.Add(settings.YAxisScaleType);
-            hash.Add(settings.MinValue);
-            hash.Add(settings.MaxValue);
+            if (settings is ParameterPlotSettings parameter)
+            {
+                hash.Add(parameter.GetBinCount());
+                hash.Add(parameter.MinValue);
+                hash.Add(parameter.MaxValue);
+            }
+
+            switch (settings)
+            {
+                case HistogramSettings histogram:
+                    hash.Add(histogram.XFeature);
+                    hash.Add(histogram.XAxisScaleType);
+                    break;
+                case PseudocolorSettings pseudocolor:
+                    hash.Add(pseudocolor.XFeature);
+                    hash.Add(pseudocolor.YFeature);
+                    hash.Add(pseudocolor.XAxisScaleType);
+                    hash.Add(pseudocolor.YAxisScaleType);
+                    break;
+                case SpectralRibbonSettings spectral:
+                    hash.Add(spectral.YAxisScaleType);
+                    break;
+            }
+
             hash.Add(targetSize.PixelWidth);
             hash.Add(targetSize.PixelHeight);
             return hash.ToHashCode();

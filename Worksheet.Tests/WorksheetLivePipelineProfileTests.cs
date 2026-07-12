@@ -99,7 +99,8 @@ public sealed class WorksheetLivePipelineProfileTests
         RegisterPlot(session, factory, PlotType.SpectralRibbon, dataWidth: 890, dataHeight: 210);
         RegisterPlot(session, factory, PlotType.Oscilloscope, dataWidth: 470, dataHeight: 210, settings =>
         {
-            settings.OscilloscopeChannelIndices = new[] { 0, 1, 2, 3 };
+            if (settings is ScopeSettings scope)
+                scope.ChannelIndices = new[] { 0, 1, 2, 3 };
         });
     }
 

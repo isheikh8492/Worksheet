@@ -82,7 +82,15 @@ namespace Worksheet.Views.Support
             var plot = CreateBasePlot(width, height);
 
             var settings = CreateSettings(plotType);
-            settings.XAxisScaleType = axisScale;
+            switch (settings)
+            {
+                case HistogramSettings histogram:
+                    histogram.XAxisScaleType = axisScale;
+                    break;
+                case PseudocolorSettings pseudocolor:
+                    pseudocolor.XAxisScaleType = axisScale;
+                    break;
+            }
             plotView = CreatePlotView(plotType, settings);
             try
             {
@@ -119,55 +127,39 @@ namespace Worksheet.Views.Support
         {
             return plotType switch
             {
-                PlotType.Histogram => new PlotSettings
+                PlotType.Histogram => new HistogramSettings
                 {
-                    PlotType = PlotType.Histogram,
                     BinCount = 256,
                     XFeature = 0,
-                    YFeature = 0,
-                    XAxisScaleType = AxisScaleType.Logarithmic,
-                    YAxisScaleType = AxisScaleType.Linear
+                    XAxisScaleType = AxisScaleType.Logarithmic
                 },
-                PlotType.Pseudocolor => new PlotSettings
+                PlotType.Pseudocolor => new PseudocolorSettings
                 {
-                    PlotType = PlotType.Pseudocolor,
                     BinCount = 256,
                     XFeature = 0,
                     YFeature = 1,
                     XAxisScaleType = AxisScaleType.Logarithmic,
                     YAxisScaleType = AxisScaleType.Logarithmic
                 },
-                PlotType.SpectralRibbon => new PlotSettings
+                PlotType.SpectralRibbon => new SpectralRibbonSettings
                 {
-                    PlotType = PlotType.SpectralRibbon,
                     BinCount = 256,
-                    XFeature = 0,
-                    YFeature = 0,
-                    XAxisScaleType = AxisScaleType.Linear,
                     YAxisScaleType = AxisScaleType.Logarithmic
                 },
-                PlotType.Oscilloscope => new PlotSettings
-                {
-                    PlotType = PlotType.Oscilloscope,
-                    BinCount = 1750,
-                    XFeature = 0,
-                    YFeature = 0,
-                    XAxisScaleType = AxisScaleType.Linear,
-                    YAxisScaleType = AxisScaleType.Linear
-                },
+                PlotType.Oscilloscope => new ScopeSettings(),
                 _ => throw new ArgumentOutOfRangeException(nameof(plotType), plotType, "Unsupported plot type.")
             };
         }
 
         public PlotView CreatePlotView(PlotType plotType, PlotSettings settings)
         {
-            return plotType switch
+            return settings switch
             {
-                PlotType.Histogram => new HistogramPlotView(_histogramContextMenu, _axisFactory, settings, new GateVisualManager()),
-                PlotType.Pseudocolor => new PseudocolorPlotView(_pseudocolorContextMenu, settings, new GateVisualManager()),
-                PlotType.SpectralRibbon => new SpectralRibbonPlotView(_spectralRibbonContextMenu, settings),
-                PlotType.Oscilloscope => new OscilloscopePlotView(_oscilloscopeContextMenu, settings),
-                _ => throw new ArgumentOutOfRangeException(nameof(plotType), plotType, "Unsupported plot type.")
+                HistogramSettings histogram => new HistogramPlotView(_histogramContextMenu, _axisFactory, histogram, new GateVisualManager()),
+                PseudocolorSettings pseudocolor => new PseudocolorPlotView(_pseudocolorContextMenu, pseudocolor, new GateVisualManager()),
+                SpectralRibbonSettings spectral => new SpectralRibbonPlotView(_spectralRibbonContextMenu, spectral),
+                ScopeSettings scope => new OscilloscopePlotView(_oscilloscopeContextMenu, scope),
+                _ => throw new ArgumentOutOfRangeException(nameof(settings), plotType, "Unsupported plot type.")
             };
         }
 

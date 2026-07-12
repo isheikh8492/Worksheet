@@ -26,7 +26,7 @@ namespace Worksheet.Services
 
         public int GetSettingsHash(PlotSettings settings, RenderTargetSize targetSize)
         {
-            var channelIndices = settings.OscilloscopeChannelIndices;
+            var channelIndices = (settings as ScopeSettings)?.ChannelIndices;
             if (channelIndices == null || channelIndices.Length == 0)
                 return 0;
 

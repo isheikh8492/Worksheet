@@ -167,4 +167,18 @@ namespace Worksheet.Views.PlotViews
             plot.Refresh();
         }
     }
+
+    /// <summary>
+    /// A plot view strongly typed to its own settings. Exposes <see cref="Settings"/> as the
+    /// concrete settings type so each view sees only the configuration it owns.
+    /// </summary>
+    public abstract class PlotView<TSettings> : PlotView where TSettings : PlotSettings
+    {
+        protected PlotView(PlotContextMenu contextMenu, TSettings settings)
+            : base(contextMenu, settings)
+        {
+        }
+
+        public new TSettings Settings => (TSettings)base.Settings;
+    }
 }

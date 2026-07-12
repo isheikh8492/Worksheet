@@ -333,20 +333,48 @@ namespace Worksheet.Services
             double MaxValue,
             long DataVersion)
         {
-            public static GateFingerprint From(GateSettings gate, PlotSettings settings, long dataVersion) =>
-                new(
+            public static GateFingerprint From(GateSettings gate, PlotSettings settings, long dataVersion)
+            {
+                // Gates only attach to parameter plots (histogram, pseudocolor).
+                int binCount = 0, xFeature = 0, yFeature = 0;
+                AxisScaleType xScale = AxisScaleType.Linear, yScale = AxisScaleType.Linear;
+                double minValue = 0, maxValue = 0;
+
+                if (settings is ParameterPlotSettings parameter)
+                {
+                    binCount = parameter.GetBinCount();
+                    minValue = parameter.MinValue;
+                    maxValue = parameter.MaxValue;
+                }
+
+                switch (settings)
+                {
+                    case HistogramSettings histogram:
+                        xFeature = histogram.XFeature;
+                        xScale = histogram.XAxisScaleType;
+                        break;
+                    case PseudocolorSettings pseudocolor:
+                        xFeature = pseudocolor.XFeature;
+                        yFeature = pseudocolor.YFeature;
+                        xScale = pseudocolor.XAxisScaleType;
+                        yScale = pseudocolor.YAxisScaleType;
+                        break;
+                }
+
+                return new GateFingerprint(
                     gate.Plot.PlotId,
                     gate.GateType,
                     gate.Geometry.GetGeometryHash(),
                     settings.PlotType,
-                    settings.GetBinCount(),
-                    settings.XFeature,
-                    settings.YFeature,
-                    settings.XAxisScaleType,
-                    settings.YAxisScaleType,
-                    settings.MinValue,
-                    settings.MaxValue,
+                    binCount,
+                    xFeature,
+                    yFeature,
+                    xScale,
+                    yScale,
+                    minValue,
+                    maxValue,
                     dataVersion);
+            }
         }
     }
 }

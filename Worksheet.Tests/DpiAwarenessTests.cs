@@ -124,9 +124,8 @@ public sealed class DpiAwarenessTests
     }
 
     private static PlotSettings CreatePseudocolorSettings() =>
-        new()
+        new PseudocolorSettings
         {
-            PlotType = PlotType.Pseudocolor,
             BinCount = 64,
             XFeature = 0,
             YFeature = 1,
@@ -137,9 +136,8 @@ public sealed class DpiAwarenessTests
         };
 
     private static PlotSettings CreateSpectralRibbonSettings() =>
-        new()
+        new SpectralRibbonSettings
         {
-            PlotType = PlotType.SpectralRibbon,
             BinCount = 64,
             YAxisScaleType = AxisScaleType.Linear,
             MinValue = 1,

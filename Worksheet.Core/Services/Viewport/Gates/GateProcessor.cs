@@ -58,10 +58,10 @@ namespace Worksheet.Services.Viewport.Gates
 
             try
             {
-                return plotSettings.PlotType switch
+                return plotSettings switch
                 {
-                    PlotType.Histogram => ProcessHistogram(gate, plotSettings, dataVersion, options),
-                    PlotType.Pseudocolor => ProcessPseudocolor(gate, plotSettings, dataVersion, options),
+                    HistogramSettings histogram => ProcessHistogram(gate, histogram, dataVersion, options),
+                    PseudocolorSettings pseudocolor => ProcessPseudocolor(gate, pseudocolor, dataVersion, options),
                     _ => EmptyResult(gate, plotSettings, dataVersion)
                 };
             }
@@ -72,7 +72,7 @@ namespace Worksheet.Services.Viewport.Gates
             }
         }
 
-        private GateResult ProcessHistogram(GateSettings gate, PlotSettings settings, long dataVersion, GateProcessorOptions options)
+        private GateResult ProcessHistogram(GateSettings gate, HistogramSettings settings, long dataVersion, GateProcessorOptions options)
         {
             if (gate.GateType != GateType.Rectangle || gate.Geometry.Type != GateType.Rectangle)
                 return EmptyResult(gate, settings, dataVersion);
@@ -134,7 +134,7 @@ namespace Worksheet.Services.Viewport.Gates
             };
         }
 
-        private GateResult ProcessPseudocolor(GateSettings gate, PlotSettings settings, long dataVersion, GateProcessorOptions options)
+        private GateResult ProcessPseudocolor(GateSettings gate, PseudocolorSettings settings, long dataVersion, GateProcessorOptions options)
         {
             int bins = settings.GetBinCount();
             var binGeo = gate.Geometry.ToBinGeometry(bins);
@@ -659,7 +659,7 @@ namespace Worksheet.Services.Viewport.Gates
         }
 
         private static (double scale, double offset, bool isLog, double effMin, double effMax) BuildBinTransform(
-            PlotSettings settings, AxisScaleType scaleType)
+            ParameterPlotSettings settings, AxisScaleType scaleType)
         {
             double min = settings.MinValue;
             double max = settings.MaxValue;
@@ -764,7 +764,7 @@ namespace Worksheet.Services.Viewport.Gates
 
         private sealed class HistogramGateProcessingState
         {
-            public HistogramGateProcessingState(Guid gateId, int geometryHash, PlotSettings settings, int capacity)
+            public HistogramGateProcessingState(Guid gateId, int geometryHash, HistogramSettings settings, int capacity)
             {
                 GateId = gateId;
                 Reset(geometryHash, settings, capacity);
@@ -786,7 +786,7 @@ namespace Worksheet.Services.Viewport.Gates
             public double Sum { get; set; }
             public double SumSq { get; set; }
 
-            public bool Matches(int geometryHash, PlotSettings settings, int capacity)
+            public bool Matches(int geometryHash, HistogramSettings settings, int capacity)
             {
                 return GeometryHash == geometryHash
                     && BinCount == settings.GetBinCount()
@@ -797,7 +797,7 @@ namespace Worksheet.Services.Viewport.Gates
                     && RingPassed.Length == capacity;
             }
 
-            public void Reset(int geometryHash, PlotSettings settings, int capacity)
+            public void Reset(int geometryHash, HistogramSettings settings, int capacity)
             {
                 GeometryHash = geometryHash;
                 BinCount = settings.GetBinCount();
@@ -828,7 +828,7 @@ namespace Worksheet.Services.Viewport.Gates
 
         private sealed class PseudocolorGateProcessingState
         {
-            public PseudocolorGateProcessingState(Guid gateId, int geometryHash, PlotSettings settings, int capacity)
+            public PseudocolorGateProcessingState(Guid gateId, int geometryHash, PseudocolorSettings settings, int capacity)
             {
                 GateId = gateId;
                 Reset(geometryHash, settings, capacity);
@@ -855,7 +855,7 @@ namespace Worksheet.Services.Viewport.Gates
             public double SumY { get; set; }
             public double SumSqY { get; set; }
 
-            public bool Matches(int geometryHash, PlotSettings settings, int capacity)
+            public bool Matches(int geometryHash, PseudocolorSettings settings, int capacity)
             {
                 return GeometryHash == geometryHash
                     && BinCount == settings.GetBinCount()
@@ -868,7 +868,7 @@ namespace Worksheet.Services.Viewport.Gates
                     && RingPassed.Length == capacity;
             }
 
-            public void Reset(int geometryHash, PlotSettings settings, int capacity)
+            public void Reset(int geometryHash, PseudocolorSettings settings, int capacity)
             {
                 GeometryHash = geometryHash;
                 BinCount = settings.GetBinCount();

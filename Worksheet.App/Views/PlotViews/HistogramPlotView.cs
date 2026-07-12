@@ -9,7 +9,7 @@ using Worksheet.Views.Support.Gates;
 
 namespace Worksheet.Views.PlotViews
 {
-    public class HistogramPlotView : PlotView
+    public class HistogramPlotView : PlotView<HistogramSettings>
     {
         private readonly AxisFactory _axisFactory;
         private readonly GateVisualManager _gateVisualManager;
@@ -26,7 +26,7 @@ namespace Worksheet.Views.PlotViews
         public HistogramPlotView(
             HistogramPlotContextMenu contextMenu,
             AxisFactory axisFactory,
-            PlotSettings settings,
+            HistogramSettings settings,
             GateVisualManager gateVisualManager)
             : base(contextMenu, settings)
         {
@@ -219,7 +219,7 @@ namespace Worksheet.Views.PlotViews
             double MinValue,
             double MaxValue)
         {
-            public static HistogramConfigSnapshot From(PlotSettings settings) =>
+            public static HistogramConfigSnapshot From(HistogramSettings settings) =>
                 new(
                     settings.GetBinCount(),
                     settings.XFeature,

@@ -21,10 +21,9 @@ public sealed class ProcessingEngineOscilloscopeTests
             new PlotProcessor(chasmDataSource),
             new GateProcessor(chasmDataSource),
             oscilloscopeBuffer);
-        var settings = new PlotSettings
+        var settings = new ScopeSettings
         {
-            PlotType = PlotType.Oscilloscope,
-            OscilloscopeChannelIndices = [0],
+            ChannelIndices = [0],
         };
         dataStore.UpsertSettings(settings);
 
@@ -56,15 +55,13 @@ public sealed class ProcessingEngineOscilloscopeTests
             new PlotProcessor(chasmDataSource),
             new GateProcessor(chasmDataSource),
             oscilloscopeBuffer);
-        var histogramSettings = new PlotSettings
+        var histogramSettings = new HistogramSettings
         {
-            PlotType = PlotType.Histogram,
             XFeature = 0,
         };
-        var scopeSettings = new PlotSettings
+        var scopeSettings = new ScopeSettings
         {
-            PlotType = PlotType.Oscilloscope,
-            OscilloscopeChannelIndices = [0],
+            ChannelIndices = [0],
         };
         dataStore.UpsertSettings(histogramSettings);
         dataStore.UpsertSettings(scopeSettings);

@@ -31,7 +31,7 @@ namespace Worksheet.Views.PlotViews.Axes
             throw new ArgumentOutOfRangeException(nameof(scaleType), scaleType, "Unsupported axis scale type.");
         }
 
-        public void Apply(AxisScaleType scaleType, WpfPlot plot, PlotSettings settings)
+        public void Apply(AxisScaleType scaleType, WpfPlot plot, ParameterPlotSettings settings)
         {
             var item = Get(scaleType);
             item.Apply(plot, settings, AxisOrientation.Bottom);

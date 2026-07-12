@@ -11,7 +11,7 @@ using Worksheet.Views.Support.Gates;
 
 namespace Worksheet.Views.PlotViews
 {
-    public class PseudocolorPlotView : PlotView
+    public class PseudocolorPlotView : PlotView<PseudocolorSettings>
     {
         private readonly GateVisualManager _gateVisualManager;
         private PlotConfigSnapshot? _lastAppliedConfig;
@@ -21,7 +21,7 @@ namespace Worksheet.Views.PlotViews
 
         public PseudocolorPlotView(
             PseudocolorPlotContextMenu contextMenu,
-            PlotSettings settings,
+            PseudocolorSettings settings,
             GateVisualManager gateVisualManager)
             : base(contextMenu, settings)
         {
@@ -137,7 +137,7 @@ namespace Worksheet.Views.PlotViews
             WpfPlot plot,
             AxisOrientation orientation,
             AxisScaleType scaleType,
-            PlotSettings settings,
+            ParameterPlotSettings settings,
             bool resetLimits)
         {
             switch (scaleType)
@@ -153,7 +153,7 @@ namespace Worksheet.Views.PlotViews
             }
         }
 
-        private static void ApplyLinearTicks(WpfPlot plot, AxisOrientation orientation, PlotSettings settings, bool resetLimits)
+        private static void ApplyLinearTicks(WpfPlot plot, AxisOrientation orientation, ParameterPlotSettings settings, bool resetLimits)
         {
             var tickGen = LinearAxisItem.CreateDataTickGenerator(settings);
             if (orientation == AxisOrientation.Bottom)
@@ -171,7 +171,7 @@ namespace Worksheet.Views.PlotViews
 
         }
 
-        private static void ApplyLogarithmicTicks(WpfPlot plot, AxisOrientation orientation, PlotSettings settings, bool resetLimits)
+        private static void ApplyLogarithmicTicks(WpfPlot plot, AxisOrientation orientation, ParameterPlotSettings settings, bool resetLimits)
         {
             var tickGen = LogarithmicAxisItem.CreateDataTickGenerator(settings);
             if (orientation == AxisOrientation.Bottom)
@@ -198,7 +198,7 @@ namespace Worksheet.Views.PlotViews
             double MinValue,
             double MaxValue)
         {
-            public static PlotConfigSnapshot From(PlotSettings settings) =>
+            public static PlotConfigSnapshot From(PseudocolorSettings settings) =>
                 new(
                     settings.GetBinCount(),
                     settings.XFeature,

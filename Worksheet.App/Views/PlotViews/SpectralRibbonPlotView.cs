@@ -9,11 +9,11 @@ using Worksheet.Views.PlotViews.ContextMenus;
 
 namespace Worksheet.Views.PlotViews
 {
-    public class SpectralRibbonPlotView : PlotView
+    public class SpectralRibbonPlotView : PlotView<SpectralRibbonSettings>
     {
         private SpectralConfigSnapshot? _lastAppliedConfig;
 
-        public SpectralRibbonPlotView(SpectralRibbonPlotContextMenu contextMenu, PlotSettings settings)
+        public SpectralRibbonPlotView(SpectralRibbonPlotContextMenu contextMenu, SpectralRibbonSettings settings)
             : base(contextMenu, settings)
         {
         }
@@ -158,7 +158,7 @@ namespace Worksheet.Views.PlotViews
             double MinValue,
             double MaxValue)
         {
-            public static SpectralConfigSnapshot Create(PlotSettings settings, int bins, int channelCount) =>
+            public static SpectralConfigSnapshot Create(SpectralRibbonSettings settings, int bins, int channelCount) =>
                 new(
                     bins,
                     channelCount,

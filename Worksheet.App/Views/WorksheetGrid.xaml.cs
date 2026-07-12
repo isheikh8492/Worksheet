@@ -180,8 +180,8 @@ namespace Worksheet.Views
         private void AddHistogramPlotForChannel(int featureIndex)
         {
             var plot = _plotFactory.CreatePlot(PlotType.Histogram, out var plotView);
-            if (plotView?.Settings != null)
-                plotView.Settings.XFeature = featureIndex;
+            if (plotView?.Settings is HistogramSettings histogramSettings)
+                histogramSettings.XFeature = featureIndex;
 
             AddPlotToWorksheet(plot, plotView, plotView?.Settings);
         }
@@ -216,19 +216,19 @@ namespace Worksheet.Views
         private void AddConfiguredPseudocolor(double x, double y, string xName, string yName)
         {
             var plot = _plotFactory.CreatePlot(PlotType.Pseudocolor, out var plotView);
-            if (plotView?.Settings == null)
+            if (plotView?.Settings is not PseudocolorSettings pseudocolorSettings)
                 return;
 
             var channelMap = GetChannelNameToIdMap();
             if (!TryResolveChannelId(channelMap, xName, out int xId, out string resolvedX))
-                xId = plotView.Settings.XFeature;
+                xId = pseudocolorSettings.XFeature;
             if (!TryResolveChannelId(channelMap, yName, out int yId, out string resolvedY, excludeId: xId))
-                yId = plotView.Settings.YFeature;
+                yId = pseudocolorSettings.YFeature;
 
-            plotView.Settings.XFeature = xId;
-            plotView.Settings.YFeature = yId;
+            pseudocolorSettings.XFeature = xId;
+            pseudocolorSettings.YFeature = yId;
 
-            AddPlotToWorksheetAt(plot, plotView, plotView.Settings, x, y);
+            AddPlotToWorksheetAt(plot, plotView, pseudocolorSettings, x, y);
         }
 
         private void AddConfiguredSpectralRibbon(double x, double y)
@@ -259,8 +259,8 @@ namespace Worksheet.Views
                 double y = startY + row * (plotHeight + LayoutMargin);
 
                 var plot = _plotFactory.CreatePlot(PlotType.Histogram, out var plotView);
-                if (plotView?.Settings != null)
-                    plotView.Settings.XFeature = ids[i];
+                if (plotView?.Settings is HistogramSettings histogramSettings)
+                    histogramSettings.XFeature = ids[i];
 
                 AddPlotToWorksheetAt(plot, plotView, plotView?.Settings, x, y);
             }

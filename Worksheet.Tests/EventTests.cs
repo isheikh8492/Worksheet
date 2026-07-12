@@ -10,9 +10,9 @@ public sealed class EventTests
     [Fact]
     public void PlotSettingsDefaultOscilloscopeChannelCountMatchesConnectedEventShape()
     {
-        var settings = new PlotSettings { PlotType = PlotType.Oscilloscope };
+        var settings = new ScopeSettings();
 
-        Assert.Equal(51, settings.OscilloscopeChannelCount);
+        Assert.Equal(51, settings.ChannelCount);
     }
 
     [Fact]

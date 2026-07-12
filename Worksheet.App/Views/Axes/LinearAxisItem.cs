@@ -9,7 +9,7 @@ namespace Worksheet.Views.PlotViews.Axes
     {
         public override AxisScaleType ScaleType => AxisScaleType.Linear;
 
-        public override void Apply(WpfPlot plot, PlotSettings settings, AxisOrientation orientation)
+        public override void Apply(WpfPlot plot, ParameterPlotSettings settings, AxisOrientation orientation)
         {
             if (orientation == AxisOrientation.Bottom)
             {
@@ -21,7 +21,7 @@ namespace Worksheet.Views.PlotViews.Axes
             }
         }
 
-        private static void ApplyBottom(WpfPlot plot, PlotSettings settings)
+        private static void ApplyBottom(WpfPlot plot, ParameterPlotSettings settings)
         {
             plot.Plot.Axes.Bottom.TickGenerator = CreateDataTickGenerator(settings);
 
@@ -40,7 +40,7 @@ namespace Worksheet.Views.PlotViews.Axes
             };
         }
 
-        internal static FixedLinearTickGenerator CreateDataTickGenerator(PlotSettings settings)
+        internal static FixedLinearTickGenerator CreateDataTickGenerator(ParameterPlotSettings settings)
         {
             var majorValues = new double[] { 0, 20_000_000, 40_000_000, 60_000_000, 80_000_000, 100_000_000 };
             var majorPositions = new double[majorValues.Length];

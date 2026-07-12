@@ -177,9 +177,8 @@ public sealed class RenderingProfileTests
     }
 
     private static PlotSettings CreateHistogramSettings() =>
-        new()
+        new HistogramSettings
         {
-            PlotType = PlotType.Histogram,
             BinCount = 256,
             XFeature = 0,
             XAxisScaleType = AxisScaleType.Logarithmic,
@@ -188,9 +187,8 @@ public sealed class RenderingProfileTests
         };
 
     private static PlotSettings CreatePseudocolorSettings() =>
-        new()
+        new PseudocolorSettings
         {
-            PlotType = PlotType.Pseudocolor,
             BinCount = 256,
             XFeature = 0,
             YFeature = 1,
@@ -201,9 +199,8 @@ public sealed class RenderingProfileTests
         };
 
     private static PlotSettings CreateSpectralRibbonSettings() =>
-        new()
+        new SpectralRibbonSettings
         {
-            PlotType = PlotType.SpectralRibbon,
             BinCount = 256,
             YAxisScaleType = AxisScaleType.Logarithmic,
             MinValue = 1,

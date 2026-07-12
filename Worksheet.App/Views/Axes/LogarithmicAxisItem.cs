@@ -8,7 +8,7 @@ namespace Worksheet.Views.PlotViews.Axes
     {
         public override AxisScaleType ScaleType => AxisScaleType.Logarithmic;
 
-        public override void Apply(WpfPlot plot, PlotSettings settings, AxisOrientation orientation)
+        public override void Apply(WpfPlot plot, ParameterPlotSettings settings, AxisOrientation orientation)
         {
             if (orientation == AxisOrientation.Bottom)
             {
@@ -20,7 +20,7 @@ namespace Worksheet.Views.PlotViews.Axes
             }
         }
 
-        private static void ApplyBottom(WpfPlot plot, PlotSettings settings)
+        private static void ApplyBottom(WpfPlot plot, ParameterPlotSettings settings)
         {
             plot.Plot.Axes.Bottom.TickGenerator = CreateDataTickGenerator(settings);
             plot.Plot.Grid.MajorLineColor = ScottPlot.Colors.Black.WithOpacity(.15);
@@ -38,7 +38,7 @@ namespace Worksheet.Views.PlotViews.Axes
             };
         }
 
-        internal static FixedLogTickGenerator CreateDataTickGenerator(PlotSettings settings)
+        internal static FixedLogTickGenerator CreateDataTickGenerator(ParameterPlotSettings settings)
         {
             var positions = new double[9];
             var labels = new string[9];
