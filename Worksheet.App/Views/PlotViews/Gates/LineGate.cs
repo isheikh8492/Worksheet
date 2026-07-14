@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using ScottPlot.WPF;
+using Worksheet.Models.Gates;
 
 namespace Worksheet.Views.PlotViews.Gates
 {
@@ -22,6 +24,43 @@ namespace Worksheet.Views.PlotViews.Gates
         }
 
         public double YFraction { get; private set; }
+
+        // A histogram line serializes as a full-height rectangle (matches legacy EmitGateUpsert behavior).
+        public override GateType GateType => GateType.Rectangle;
+
+        public override GateGeometry ToGeometry(int binCount) =>
+            GateGeometry.FromBinRectangle(XMin, XMax, 0, binCount, binCount);
+
+        // Left edge (0), right edge (1), center (2) — all at the current y-line.
+        public override IReadOnlyList<GateHandle> GetHandles()
+        {
+            double yLine = YMin + (YMax - YMin) * YFraction;
+            return new[]
+            {
+                new GateHandle(new ScottPlot.Coordinates(XMin, yLine), 0),
+                new GateHandle(new ScottPlot.Coordinates(XMax, yLine), 1),
+                new GateHandle(new ScottPlot.Coordinates((XMin + XMax) / 2.0, yLine), 2),
+            };
+        }
+
+        public override void MoveHandle(GateHandle handle, ScottPlot.Coordinates to)
+        {
+            switch (handle.Id)
+            {
+                case 0: // left edge
+                    SetBounds(Math.Min(to.X, XMax), XMax, YMin, YMax);
+                    break;
+                case 1: // right edge
+                    SetBounds(XMin, Math.Max(to.X, XMin), YMin, YMax);
+                    break;
+                default: // center: translate horizontally + set the y-fraction from the drop point
+                    double dx = to.X - (XMin + XMax) / 2.0;
+                    SetBounds(XMin + dx, XMax + dx, YMin, YMax);
+                    double span = Math.Max(1e-9, YMax - YMin);
+                    SetYFraction((to.Y - YMin) / span);
+                    break;
+            }
+        }
 
         public void SetYFraction(double value) => YFraction = Math.Clamp(value, 0, 1);
 
