@@ -79,7 +79,6 @@ namespace Worksheet.Services.Viewport.Gates
 
             int bins = settings.GetBinCount();
             var binGeo = gate.Geometry.ToBinGeometry(bins);
-            var mask = BuildRectangleMask1D(bins, binGeo.XMin, binGeo.XMax);
 
             ChannelWindowSnapshot snapshot = _buffer.GetSnapshot(settings.XFeature);
             int total = snapshot.Count;
@@ -88,7 +87,8 @@ namespace Worksheet.Services.Viewport.Gates
 
             Scale scale = Scale.Create(settings.XAxisScaleType, settings.MinValue, settings.MaxValue, bins);
             if (options.IncludeEventIndices)
-                return ProcessHistogramFullScan(gate, settings, dataVersion, snapshot, total, mask, scale);
+                return ProcessHistogramFullScan(gate, settings, dataVersion, snapshot, total,
+                    BuildRectangleMask1D(bins, binGeo.XMin, binGeo.XMax), scale);
 
             int geometryHash = gate.Geometry.GetGeometryHash();
             HistogramGateProcessingState state;
@@ -97,13 +97,18 @@ namespace Worksheet.Services.Viewport.Gates
                 if (!_histogramStates.TryGetValue(gate.GateId, out state!))
                 {
                     state = new HistogramGateProcessingState(gate.GateId, geometryHash, settings, snapshot.Capacity);
+                    state.Mask = BuildRectangleMask1D(bins, binGeo.XMin, binGeo.XMax);
                     _histogramStates[gate.GateId] = state;
                 }
                 else if (!state.Matches(geometryHash, settings, snapshot.Capacity))
                 {
                     state.Reset(geometryHash, settings, snapshot.Capacity);
+                    state.Mask = BuildRectangleMask1D(bins, binGeo.XMin, binGeo.XMax);
                 }
             }
+
+            // Mask is a pure function of (bins, geometry) — reuse the cached one while the gate is unchanged.
+            bool[] mask = state.Mask;
 
             if (NeedsRebuild(state.LastProcessedSequence, snapshot))
             {
@@ -138,7 +143,6 @@ namespace Worksheet.Services.Viewport.Gates
         {
             int bins = settings.GetBinCount();
             var binGeo = gate.Geometry.ToBinGeometry(bins);
-            var mask2d = BuildMask2D(bins, binGeo);
 
             MultiChannelWindowSnapshot snapshot = _buffer.GetSnapshot(settings.XFeature, settings.YFeature);
             int total = snapshot.Count;
@@ -148,7 +152,8 @@ namespace Worksheet.Services.Viewport.Gates
             Scale xScale = Scale.Create(settings.XAxisScaleType, settings.MinValue, settings.MaxValue, bins);
             Scale yScale = Scale.Create(settings.YAxisScaleType, settings.MinValue, settings.MaxValue, bins);
             if (options.IncludeEventIndices)
-                return ProcessPseudocolorFullScan(gate, settings, dataVersion, snapshot, total, mask2d, xScale, yScale);
+                return ProcessPseudocolorFullScan(gate, settings, dataVersion, snapshot, total,
+                    BuildMask2D(bins, binGeo), xScale, yScale);
 
             int geometryHash = gate.Geometry.GetGeometryHash();
             PseudocolorGateProcessingState state;
@@ -157,13 +162,18 @@ namespace Worksheet.Services.Viewport.Gates
                 if (!_pseudocolorStates.TryGetValue(gate.GateId, out state!))
                 {
                     state = new PseudocolorGateProcessingState(gate.GateId, geometryHash, settings, snapshot.Capacity);
+                    state.Mask = BuildMask2D(bins, binGeo);
                     _pseudocolorStates[gate.GateId] = state;
                 }
                 else if (!state.Matches(geometryHash, settings, snapshot.Capacity))
                 {
                     state.Reset(geometryHash, settings, snapshot.Capacity);
+                    state.Mask = BuildMask2D(bins, binGeo);
                 }
             }
+
+            // Mask is a pure function of (bins, geometry) — reuse the cached one while the gate is unchanged.
+            bool[,] mask2d = state.Mask;
 
             if (NeedsRebuild(state.LastProcessedSequence, snapshot))
             {
@@ -715,6 +725,8 @@ namespace Worksheet.Services.Viewport.Gates
             public ScaleType ScaleType { get; private set; }
             public double MinValue { get; private set; }
             public double MaxValue { get; private set; }
+            // Cached inside-gate bin mask; rebuilt only when geometry/bins change.
+            public bool[] Mask { get; set; } = Array.Empty<bool>();
             public bool[] RingPassed { get; private set; } = Array.Empty<bool>();
             public double[] RingValues { get; private set; } = Array.Empty<double>();
             public int RingStart { get; set; }
@@ -781,6 +793,8 @@ namespace Worksheet.Services.Viewport.Gates
             public ScaleType YAxisScaleType { get; private set; }
             public double MinValue { get; private set; }
             public double MaxValue { get; private set; }
+            // Cached inside-gate bin mask; rebuilt only when geometry/bins change.
+            public bool[,] Mask { get; set; } = new bool[0, 0];
             public bool[] RingPassed { get; private set; } = Array.Empty<bool>();
             public double[] RingXValues { get; private set; } = Array.Empty<double>();
             public double[] RingYValues { get; private set; } = Array.Empty<double>();
