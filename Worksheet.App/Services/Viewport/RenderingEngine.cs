@@ -20,15 +20,10 @@ namespace Worksheet.Services
         private readonly Dictionary<Guid, PendingRender> _pendingRenders = new();
         private int _renderPassScheduled;
 
+        private static readonly int PlotTypeCount = Enum.GetValues<PlotType>().Length;
         private readonly object _metricsLock = new();
-        private double _histRenderTotalMs;
-        private long _histRenderCount;
-        private double _pcRenderTotalMs;
-        private long _pcRenderCount;
-        private double _srRenderTotalMs;
-        private long _srRenderCount;
-        private double _scopeRenderTotalMs;
-        private long _scopeRenderCount;
+        private readonly double[] _renderTotalMs = new double[PlotTypeCount];
+        private readonly long[] _renderCount = new long[PlotTypeCount];
 
         public RenderingEngine(DataStore dataStore, Dispatcher dispatcher, TimeSpan interval)
             : base(interval)
@@ -97,10 +92,10 @@ namespace Worksheet.Services
             lock (_metricsLock)
             {
                 return new PlotTimingSnapshot(
-                    HistogramAverageMs: ComputeAverage(_histRenderTotalMs, _histRenderCount),
-                    PseudocolorAverageMs: ComputeAverage(_pcRenderTotalMs, _pcRenderCount),
-                    SpectralRibbonAverageMs: ComputeAverage(_srRenderTotalMs, _srRenderCount),
-                    OscilloscopeAverageMs: ComputeAverage(_scopeRenderTotalMs, _scopeRenderCount));
+                    HistogramAverageMs: ComputeAverage(PlotType.Histogram),
+                    PseudocolorAverageMs: ComputeAverage(PlotType.Pseudocolor),
+                    SpectralRibbonAverageMs: ComputeAverage(PlotType.SpectralRibbon),
+                    OscilloscopeAverageMs: ComputeAverage(PlotType.Oscilloscope));
             }
         }
 
@@ -108,14 +103,8 @@ namespace Worksheet.Services
         {
             lock (_metricsLock)
             {
-                _histRenderTotalMs = 0;
-                _histRenderCount = 0;
-                _pcRenderTotalMs = 0;
-                _pcRenderCount = 0;
-                _srRenderTotalMs = 0;
-                _srRenderCount = 0;
-                _scopeRenderTotalMs = 0;
-                _scopeRenderCount = 0;
+                Array.Clear(_renderTotalMs);
+                Array.Clear(_renderCount);
             }
         }
 
@@ -176,31 +165,15 @@ namespace Worksheet.Services
         {
             lock (_metricsLock)
             {
-                switch (plotType)
-                {
-                    case PlotType.Histogram:
-                        _histRenderTotalMs += elapsedMs;
-                        _histRenderCount++;
-                        break;
-                    case PlotType.Pseudocolor:
-                        _pcRenderTotalMs += elapsedMs;
-                        _pcRenderCount++;
-                        break;
-                    case PlotType.SpectralRibbon:
-                        _srRenderTotalMs += elapsedMs;
-                        _srRenderCount++;
-                        break;
-                    case PlotType.Oscilloscope:
-                        _scopeRenderTotalMs += elapsedMs;
-                        _scopeRenderCount++;
-                        break;
-                }
+                _renderTotalMs[(int)plotType] += elapsedMs;
+                _renderCount[(int)plotType]++;
             }
         }
 
-        private static double ComputeAverage(double totalMs, long count)
+        private double ComputeAverage(PlotType plotType)
         {
-            return count > 0 ? totalMs / count : 0;
+            long count = _renderCount[(int)plotType];
+            return count > 0 ? _renderTotalMs[(int)plotType] / count : 0;
         }
 
         private sealed class RenderTarget

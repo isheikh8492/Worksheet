@@ -21,16 +21,11 @@ namespace Worksheet.Services
         private readonly HashSet<Guid> _activePlotIds = new();
         private readonly HashSet<Guid> _activeGateIds = new();
         private readonly List<Guid> _staleIds = new();
+        private static readonly int PlotTypeCount = Enum.GetValues<PlotType>().Length;
         private readonly object _metricsLock = new();
         private DateTime _lastGateProcessUtc = DateTime.MinValue;
-        private double _histComputeTotalMs;
-        private long _histComputeCount;
-        private double _pcComputeTotalMs;
-        private long _pcComputeCount;
-        private double _srComputeTotalMs;
-        private long _srComputeCount;
-        private double _scopeComputeTotalMs;
-        private long _scopeComputeCount;
+        private readonly double[] _computeTotalMs = new double[PlotTypeCount];
+        private readonly long[] _computeCount = new long[PlotTypeCount];
 
         public ProcessingEngine(
             DataStore dataStore,
@@ -226,10 +221,10 @@ namespace Worksheet.Services
             lock (_metricsLock)
             {
                 return new PlotTimingSnapshot(
-                    HistogramAverageMs: ComputeAverage(_histComputeTotalMs, _histComputeCount),
-                    PseudocolorAverageMs: ComputeAverage(_pcComputeTotalMs, _pcComputeCount),
-                    SpectralRibbonAverageMs: ComputeAverage(_srComputeTotalMs, _srComputeCount),
-                    OscilloscopeAverageMs: ComputeAverage(_scopeComputeTotalMs, _scopeComputeCount));
+                    HistogramAverageMs: ComputeAverage(PlotType.Histogram),
+                    PseudocolorAverageMs: ComputeAverage(PlotType.Pseudocolor),
+                    SpectralRibbonAverageMs: ComputeAverage(PlotType.SpectralRibbon),
+                    OscilloscopeAverageMs: ComputeAverage(PlotType.Oscilloscope));
             }
         }
 
@@ -243,14 +238,8 @@ namespace Worksheet.Services
         {
             lock (_metricsLock)
             {
-                _histComputeTotalMs = 0;
-                _histComputeCount = 0;
-                _pcComputeTotalMs = 0;
-                _pcComputeCount = 0;
-                _srComputeTotalMs = 0;
-                _srComputeCount = 0;
-                _scopeComputeTotalMs = 0;
-                _scopeComputeCount = 0;
+                Array.Clear(_computeTotalMs);
+                Array.Clear(_computeCount);
             }
 
             _pipelines.ResetStates();
@@ -274,31 +263,15 @@ namespace Worksheet.Services
         {
             lock (_metricsLock)
             {
-                switch (plotType)
-                {
-                    case PlotType.Histogram:
-                        _histComputeTotalMs += elapsedMs;
-                        _histComputeCount++;
-                        break;
-                    case PlotType.Pseudocolor:
-                        _pcComputeTotalMs += elapsedMs;
-                        _pcComputeCount++;
-                        break;
-                    case PlotType.SpectralRibbon:
-                        _srComputeTotalMs += elapsedMs;
-                        _srComputeCount++;
-                        break;
-                    case PlotType.Oscilloscope:
-                        _scopeComputeTotalMs += elapsedMs;
-                        _scopeComputeCount++;
-                        break;
-                }
+                _computeTotalMs[(int)plotType] += elapsedMs;
+                _computeCount[(int)plotType]++;
             }
         }
 
-        private static double ComputeAverage(double totalMs, long count)
+        private double ComputeAverage(PlotType plotType)
         {
-            return count > 0 ? totalMs / count : 0;
+            long count = _computeCount[(int)plotType];
+            return count > 0 ? _computeTotalMs[(int)plotType] / count : 0;
         }
 
         private readonly record struct SettingsFingerprint(
