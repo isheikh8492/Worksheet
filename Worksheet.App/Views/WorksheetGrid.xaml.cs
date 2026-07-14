@@ -131,7 +131,7 @@ namespace Worksheet.Views
             // Create the plot (with fixed padding that aligns with grid)
             var plot = _plotFactory.CreatePlot(200, 200);
 
-            AddPlotToWorksheet(plot, null, null);
+            AddPlot(plot, null, null);
         }
 
         public void AddPlot(PlotType plotType)
@@ -140,7 +140,7 @@ namespace Worksheet.Views
             {
                 // Create the plot using PlotFactory defaults
                 var plot = _plotFactory.CreatePlot(plotType, out var plotView);
-                AddPlotToWorksheet(plot, plotView, plotView?.Settings);
+                AddPlot(plot, plotView, plotView?.Settings);
             }
             catch (Exception ex)
             {
@@ -154,7 +154,7 @@ namespace Worksheet.Views
             {
                 // Create the plot using PlotFactory defaults
                 var plot = _plotFactory.CreatePlot(plotType, axisScale, out var plotView);
-                AddPlotToWorksheet(plot, plotView, plotView?.Settings);
+                AddPlot(plot, plotView, plotView?.Settings);
             }
             catch (Exception ex)
             {
@@ -183,7 +183,7 @@ namespace Worksheet.Views
             if (plotView?.Settings is HistogramSettings histogramSettings)
                 histogramSettings.XFeature = featureIndex;
 
-            AddPlotToWorksheet(plot, plotView, plotView?.Settings);
+            AddPlot(plot, plotView, plotView?.Settings);
         }
 
         public void LoadConfig()
@@ -228,7 +228,7 @@ namespace Worksheet.Views
             pseudocolorSettings.XFeature = xId;
             pseudocolorSettings.YFeature = yId;
 
-            AddPlotToWorksheetAt(plot, plotView, pseudocolorSettings, x, y);
+            AddPlot(plot, plotView, pseudocolorSettings, x, y);
         }
 
         private void AddConfiguredSpectralRibbon(double x, double y)
@@ -237,7 +237,7 @@ namespace Worksheet.Views
             if (plotView?.Settings == null)
                 return;
 
-            AddPlotToWorksheetAt(plot, plotView, plotView.Settings, x, y);
+            AddPlot(plot, plotView, plotView.Settings, x, y);
         }
 
         private void AddHistogramGrid(double startY, double worksheetWidth)
@@ -262,7 +262,7 @@ namespace Worksheet.Views
                 if (plotView?.Settings is HistogramSettings histogramSettings)
                     histogramSettings.XFeature = ids[i];
 
-                AddPlotToWorksheetAt(plot, plotView, plotView?.Settings, x, y);
+                AddPlot(plot, plotView, plotView?.Settings, x, y);
             }
         }
 
@@ -358,147 +358,75 @@ namespace Worksheet.Views
             return double.TryParse(s, out nm);
         }
 
-        private void AddPlotToWorksheetAt(ScottPlot.WPF.WpfPlot plot, PlotView? plotView, PlotSettings? settings, double x, double y)
+        private void AddPlot(ScottPlot.WPF.WpfPlot plot, PlotView? plotView, PlotSettings? settings, double? x = null, double? y = null)
         {
             try
             {
-            var worksheetWidth = WorksheetScrollViewer.ViewportWidth > 0
-                ? WorksheetScrollViewer.ViewportWidth
-                : 800;
+                var worksheetWidth = WorksheetScrollViewer.ViewportWidth > 0
+                    ? WorksheetScrollViewer.ViewportWidth
+                    : 800; // fallback if not yet rendered
+                var container = _containerFactory.CreateContainer(plot, WorksheetGridContainer.Children.Count, worksheetWidth);
 
-            var container = _containerFactory.CreateContainer(plot, WorksheetGridContainer.Children.Count, worksheetWidth);
-            Canvas.SetLeft(container.Container, x);
-            Canvas.SetTop(container.Container, y);
+                // Explicit placement when provided; otherwise the container flows into the grid.
+                if (x.HasValue) Canvas.SetLeft(container.Container, x.Value);
+                if (y.HasValue) Canvas.SetTop(container.Container, y.Value);
 
-            var thumbs = _thumbManager.CreateThumbs(container.Overlay);
-            _thumbManager.AttachPositioning(plot, thumbs);
-            _thumbManager.AttachResize(thumbs, container, plot, () => SnapSize);
+                var thumbs = _thumbManager.CreateThumbs(container.Overlay);
+                _thumbManager.AttachPositioning(plot, thumbs);
+                _thumbManager.AttachResize(thumbs, container, plot, () => SnapSize);
 
-            var plotItem = new PlotItem(plot, container, thumbs)
-            {
-                PlotView = plotView,
-                OnCloseRequested = (item) =>
+                var plotItem = new PlotItem(plot, container, thumbs)
                 {
-                    if (settings != null)
+                    PlotView = plotView,
+                    OnCloseRequested = (item) =>
                     {
-                        _viewportSession.UnregisterPlot(settings.Id);
+                        if (settings != null)
+                        {
+                            _viewportSession.UnregisterPlot(settings.Id);
+                        }
+
+                        _selectionManager.Unregister(item);
+                        _plotItems.Remove(item);
+                        WorksheetGridContainer.Children.Remove(item.Container);
                     }
+                };
 
-                    _selectionManager.Unregister(item);
-                    _plotItems.Remove(item);
-                    WorksheetGridContainer.Children.Remove(item.Container);
+                _dragHandler.AttachDrag(container.DragLayer, plotItem,
+                                        WorksheetGridContainer, _selectionManager, () => SnapSize);
+
+                // Attach plot-specific gate sinks.
+                if (plotView is PseudocolorPlotView pcView)
+                {
+                    pcView.GateSettingsSink = gate => _viewportSession.UpsertGate(gate);
+                    pcView.GateRemovedSink = gateId => _viewportSession.RemoveGate(gateId);
                 }
-            };
+                else if (plotView is HistogramPlotView histView)
+                {
+                    histView.GateSettingsSink = gate => _viewportSession.UpsertGate(gate);
+                    histView.GateRemovedSink = gateId => _viewportSession.RemoveGate(gateId);
+                }
 
-            _dragHandler.AttachDrag(container.DragLayer, plotItem,
-                                    WorksheetGridContainer, _selectionManager, () => SnapSize);
+                plotView?.AttachOverlay(container.Overlay);
+                plotView?.AttachBitmapSurface(plot, container.DynamicSurface, container.DataRectBacking);
+                plotView?.AttachContextMenu(plotItem);
+                _selectionManager.Register(plotItem, plotItem.OnSelect, plotItem.OnDeselect);
 
-            if (plotView is PseudocolorPlotView pcView)
-            {
-                pcView.GateSettingsSink = gate => _viewportSession.UpsertGate(gate);
-                pcView.GateRemovedSink = gateId => _viewportSession.RemoveGate(gateId);
-            }
-            else if (plotView is HistogramPlotView histView)
-            {
-                histView.GateSettingsSink = gate => _viewportSession.UpsertGate(gate);
-                histView.GateRemovedSink = gateId => _viewportSession.RemoveGate(gateId);
-            }
+                // Register with ViewportSession for processing/rendering.
+                if (plotView != null && settings != null)
+                {
+                    _viewportSession.RegisterPlot(settings);
+                    _viewportSession.RegisterRenderTarget(plot, plotView, settings);
+                }
 
-            plotView?.AttachOverlay(container.Overlay);
-            plotView?.AttachBitmapSurface(plot, container.DynamicSurface, container.DataRectBacking);
-            plotView?.AttachContextMenu(plotItem);
-            _selectionManager.Register(plotItem, plotItem.OnSelect, plotItem.OnDeselect);
-
-            if (plotView != null && settings != null)
-            {
-                _viewportSession.RegisterPlot(settings);
-                _viewportSession.RegisterRenderTarget(plot, plotView, settings);
-            }
-
-            WorksheetGridContainer.Children.Add(container.Container);
-            Panel.SetZIndex(container.Container, _nextZIndex++);
-            _plotItems.Add(plotItem);
-            EnsureWorksheetBoundsIfExceeded(container.Container);
-            _selectionManager.Select(plotItem);
+                WorksheetGridContainer.Children.Add(container.Container);
+                Panel.SetZIndex(container.Container, _nextZIndex++);
+                _plotItems.Add(plotItem);
+                EnsureWorksheetBoundsIfExceeded(container.Container);
+                _selectionManager.Select(plotItem);
             }
             catch (Exception ex)
             {
-                Worksheet.Services.AppLog.Exception(ex, $"WorksheetGrid.AddPlotToWorksheetAt plotType={settings?.PlotType} plotId={settings?.Id}");
-            }
-        }
-
-        private void AddPlotToWorksheet(ScottPlot.WPF.WpfPlot plot, PlotView? plotView, PlotSettings? settings)
-        {
-            try
-            {
-            // Create the container structure (use ActualWidth for grid layout)
-            var worksheetWidth = WorksheetScrollViewer.ViewportWidth > 0
-                ? WorksheetScrollViewer.ViewportWidth
-                : 800; // fallback if not yet rendered
-            var container = _containerFactory.CreateContainer(plot, WorksheetGridContainer.Children.Count, worksheetWidth);
-
-            // Create and setup thumbs
-            var thumbs = _thumbManager.CreateThumbs(container.Overlay);
-            _thumbManager.AttachPositioning(plot, thumbs);
-            _thumbManager.AttachResize(thumbs, container, plot, () => SnapSize);
-
-            // Create the worksheet item with metadata
-            var plotItem = new PlotItem(plot, container, thumbs)
-            {
-                PlotView = plotView,
-                OnCloseRequested = (item) =>
-                {
-                    if (settings != null)
-                    {
-                        _viewportSession.UnregisterPlot(settings.Id);
-                    }
-
-                    _selectionManager.Unregister(item);
-                    _plotItems.Remove(item);
-                    WorksheetGridContainer.Children.Remove(item.Container);
-                }
-            };
-
-            // Setup drag behavior with snapping
-            _dragHandler.AttachDrag(container.DragLayer, plotItem,
-                                    WorksheetGridContainer, _selectionManager, () => SnapSize);
-
-            // Attach plot-specific context menu
-            if (plotView is PseudocolorPlotView pcView)
-            {
-                pcView.GateSettingsSink = gate => _viewportSession.UpsertGate(gate);
-                pcView.GateRemovedSink = gateId => _viewportSession.RemoveGate(gateId);
-            }
-            else if (plotView is HistogramPlotView histView)
-            {
-                histView.GateSettingsSink = gate => _viewportSession.UpsertGate(gate);
-                histView.GateRemovedSink = gateId => _viewportSession.RemoveGate(gateId);
-            }
-
-            plotView?.AttachOverlay(container.Overlay);
-            plotView?.AttachBitmapSurface(plot, container.DynamicSurface, container.DataRectBacking);
-            plotView?.AttachContextMenu(plotItem);
-
-            // Register with selection manager
-            _selectionManager.Register(plotItem, plotItem.OnSelect, plotItem.OnDeselect);
-
-            // Register with ViewportSession for processing/rendering.
-            if (plotView != null && settings != null)
-            {
-                _viewportSession.RegisterPlot(settings);
-                _viewportSession.RegisterRenderTarget(plot, plotView, settings);
-            }
-
-            // Add to worksheet and select
-            WorksheetGridContainer.Children.Add(container.Container);
-            Panel.SetZIndex(container.Container, _nextZIndex++);
-            _plotItems.Add(plotItem);
-            EnsureWorksheetBoundsIfExceeded(container.Container);
-            _selectionManager.Select(plotItem);
-            }
-            catch (Exception ex)
-            {
-                Worksheet.Services.AppLog.Exception(ex, $"WorksheetGrid.AddPlotToWorksheet plotType={settings?.PlotType} plotId={settings?.Id}");
+                Worksheet.Services.AppLog.Exception(ex, $"WorksheetGrid.AddPlot plotType={settings?.PlotType} plotId={settings?.Id}");
             }
         }
 
