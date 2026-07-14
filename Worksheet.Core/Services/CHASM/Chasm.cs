@@ -52,7 +52,7 @@ namespace Worksheet.Services
 
             _producer.Stop();
             _consumerCts?.Cancel();
-            ObserveStoppedTask(_consumerTask, "Chasm.StopStreaming");
+            StoppableTask.Observe(_consumerTask, StopWaitTimeout, "Chasm.StopStreaming");
 
             // Drain any queued batches so restart doesn't replay stale data.
             while (_producer.Reader.TryRead(out _)) { }
@@ -75,31 +75,6 @@ namespace Worksheet.Services
                 disposableProducer.Dispose();
         }
 
-        private static void ObserveStoppedTask(Task? task, string context)
-        {
-            if (task == null)
-                return;
-
-            try
-            {
-                if (!task.Wait(StopWaitTimeout))
-                    AppLog.Error($"{context} timed out", $"timeoutMs={StopWaitTimeout.TotalMilliseconds:F0}");
-            }
-            catch (AggregateException ex) when (IsCancellationOnly(ex))
-            {
-            }
-        }
-
-        private static bool IsCancellationOnly(AggregateException ex)
-        {
-            foreach (var inner in ex.Flatten().InnerExceptions)
-            {
-                if (inner is not OperationCanceledException)
-                    return false;
-            }
-
-            return true;
-        }
     }
 }
 

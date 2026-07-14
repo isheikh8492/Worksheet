@@ -74,7 +74,7 @@ namespace Worksheet.Services
             // Prevent stale batches from being consumed after restart.
             while (_channel.Reader.TryRead(out _)) { }
 
-            ObserveStoppedTask(_task, "MockProducer.Stop");
+            StoppableTask.Observe(_task, StopWaitTimeout, "MockProducer.Stop");
             _cts?.Dispose();
             _cts = null;
             _task = null;
@@ -88,32 +88,6 @@ namespace Worksheet.Services
                 await RunMaxThroughputAsync(token).ConfigureAwait(false);
             else
                 await RunFixedRateAsync(token).ConfigureAwait(false);
-        }
-
-        private static void ObserveStoppedTask(Task? task, string context)
-        {
-            if (task == null)
-                return;
-
-            try
-            {
-                if (!task.Wait(StopWaitTimeout))
-                    AppLog.Error($"{context} timed out", $"timeoutMs={StopWaitTimeout.TotalMilliseconds:F0}");
-            }
-            catch (AggregateException ex) when (IsCancellationOnly(ex))
-            {
-            }
-        }
-
-        private static bool IsCancellationOnly(AggregateException ex)
-        {
-            foreach (var inner in ex.Flatten().InnerExceptions)
-            {
-                if (inner is not OperationCanceledException)
-                    return false;
-            }
-
-            return true;
         }
 
         private async Task RunFixedRateAsync(CancellationToken token)

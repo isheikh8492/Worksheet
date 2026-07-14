@@ -136,10 +136,10 @@ namespace Worksheet.Views.Support
                 // Snap size and position to grid
                 if (snapSize > 0)
                 {
-                    newW = SnapToGrid(newW, snapSize);
-                    newH = SnapToGrid(newH, snapSize);
-                    newX = SnapToGrid(newX, snapSize);
-                    newY = SnapToGrid(newY, snapSize);
+                    newW = GridSnap.Snap(newW, snapSize);
+                    newH = GridSnap.Snap(newH, snapSize);
+                    newX = GridSnap.Snap(newX, snapSize);
+                    newY = GridSnap.Snap(newY, snapSize);
                 }
 
                 Canvas.SetLeft(container.Container, newX);
@@ -149,15 +149,6 @@ namespace Worksheet.Views.Support
 
                 plot.Refresh();
             };
-        }
-
-        private static double SnapToGrid(double value, double gridSize)
-        {
-            double snapIncrement = gridSize / 2.0;
-            if (snapIncrement <= 0)
-                return value;
-
-            return Math.Round(value / snapIncrement) * snapIncrement;
         }
 
         private static Thumb MakeThumb(Cursor cursor)

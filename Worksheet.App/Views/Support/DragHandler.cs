@@ -41,8 +41,8 @@ namespace Worksheet.Views.Support
                     // Snap to grid if enabled
                     if (snapSize > 0)
                     {
-                        x = SnapToGrid(x, snapSize);
-                        y = SnapToGrid(y, snapSize);
+                        x = GridSnap.Snap(x, snapSize);
+                        y = GridSnap.Snap(y, snapSize);
                     }
 
                     Canvas.SetLeft(item.Container, x);
@@ -58,8 +58,8 @@ namespace Worksheet.Views.Support
                 // Snap on release as well (in case snapping wasn't applied during move)
                 if (snapSize > 0)
                 {
-                    double x = SnapToGrid(Canvas.GetLeft(item.Container), snapSize);
-                    double y = SnapToGrid(Canvas.GetTop(item.Container), snapSize);
+                    double x = GridSnap.Snap(Canvas.GetLeft(item.Container), snapSize);
+                    double y = GridSnap.Snap(Canvas.GetTop(item.Container), snapSize);
                     Canvas.SetLeft(item.Container, x);
                     Canvas.SetTop(item.Container, y);
                 }
@@ -69,13 +69,5 @@ namespace Worksheet.Views.Support
             };
         }
 
-        private static double SnapToGrid(double value, double gridSize)
-        {
-            double snapIncrement = gridSize / 2.0;
-            if (snapIncrement <= 0)
-                return value;
-
-            return Math.Round(value / snapIncrement) * snapIncrement;
-        }
     }
 }
