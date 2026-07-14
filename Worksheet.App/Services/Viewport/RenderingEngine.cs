@@ -5,10 +5,12 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Threading;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Views.PlotViews;
+using Worksheet.Core.Models;
+using Worksheet.App.Views.PlotViews;
 
-namespace Worksheet.Services
+using Worksheet.Processing;
+using Worksheet.Core.Services;
+namespace Worksheet.App.Services.Viewport
 {
     public class RenderingEngine : PollingEngine
     {
@@ -195,6 +197,6 @@ namespace Worksheet.Services
             public object? LastRenderedData { get; set; }
         }
 
-        private readonly record struct PendingRender(RenderTarget Target, Models.Data.ProcessedPlotData Data);
+        private readonly record struct PendingRender(RenderTarget Target, Worksheet.Core.Models.Data.ProcessedPlotData Data);
     }
 }

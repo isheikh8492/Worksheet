@@ -8,14 +8,17 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using Worksheet.Models;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews;
-using Worksheet.Views.Support;
-using Worksheet.Views.Surfaces;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
+using Worksheet.App.Views.PlotViews;
+using Worksheet.App.Views.Support;
+using Worksheet.App.Views.Surfaces;
 using Xunit;
 using Xunit.Abstractions;
 
+using Worksheet.App.Services.Viewport;
 namespace Worksheet.Tests;
 
 public sealed class WorksheetLivePipelineProfileTests

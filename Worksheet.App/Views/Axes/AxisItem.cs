@@ -1,8 +1,8 @@
 using System;
 using ScottPlot.WPF;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 
-namespace Worksheet.Views.PlotViews.Axes
+namespace Worksheet.App.Views.Axes
 {
     public abstract class AxisItem
     {

@@ -3,9 +3,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Worksheet.Views.PlotViews.Gates;
+using Worksheet.App.Views.PlotViews.Gates;
 
-namespace Worksheet.Views.Support.Gates
+namespace Worksheet.App.Views.Support.Gates
 {
     internal enum PreviewKind { Rectangle, Ellipse, Polyline }
 

@@ -68,7 +68,7 @@ flowchart LR
 | Layer | Main classes | Owns | Does not own |
 | --- | --- | --- | --- |
 | App orchestration | `ViewportSession` | Object graph, start/stop, memory clear, status snapshots | Numeric plot algorithms |
-| Ingestion lifecycle | `Chasm` | Producer start/stop and consumer loop lifetime | Plot processing or rendering |
+| Ingestion lifecycle | `ChasmEngine` | Producer start/stop and consumer loop lifetime | Plot processing or rendering |
 | Acquisition inputs | `MockProducer`, `EventProducer`, `IEventIngestionPort` | Creating or receiving incoming event batches | Retained event memory |
 | Batch conversion | `EventBatchConverter` | `Event.Parameters` to `ColumnMajorEventBatch` | Waveforms, rendering, rolling storage |
 | Queue transport | `Channel<IEventBatch>` | Short bounded queue between producer and consumer | Long-term storage |
@@ -174,7 +174,7 @@ With a jagged batch, that can mean thousands of arrays per batch. With a flat co
 
 ## CHASM Queue And Streaming Lifecycle
 
-`Chasm` owns the streaming lifecycle:
+`ChasmEngine` owns the streaming lifecycle:
 
 ```text
 StartStreaming()
@@ -521,23 +521,23 @@ These are useful averages for development and quick comparisons. They are not fu
 For ingestion:
 
 1. `Worksheet.App/Services/Viewport/ViewportSession.cs`
-2. `Worksheet.Core/Services/CHASM/ChasmPipelineFactory.cs`
-3. `Worksheet.Core/Services/CHASM/Chasm.cs`
-4. `Worksheet.Core/Services/CHASM/MockProducer.cs` or `EventProducer.cs`
-5. `Worksheet.Core/Services/CHASM/EventBatchConverter.cs`
-6. `Worksheet.Core/Services/CHASM/ChasmConsumer.cs`
-7. `Worksheet.Core/Services/CHASM/ChasmDataSource.cs`
-8. `Worksheet.Core/Services/Viewport/DataSource.cs`
+2. `Worksheet.Chasm/ChasmPipelineFactory.cs`
+3. `Worksheet.Chasm/ChasmEngine.cs`
+4. `Worksheet.Chasm/MockProducer.cs` or `EventProducer.cs`
+5. `Worksheet.Chasm/EventBatchConverter.cs`
+6. `Worksheet.Chasm/ChasmConsumer.cs`
+7. `Worksheet.Chasm/ChasmDataSource.cs`
+8. `Worksheet.Chasm/DataSource.cs`
 
 For plot processing:
 
-1. `Worksheet.Core/Services/Viewport/ProcessingEngine.cs`
-2. `Worksheet.Core/Services/Viewport/PlotPipelineRegistry.cs`
-3. `Worksheet.Core/Services/Viewport/ParameterPlotPipeline.cs`
-4. `Worksheet.Core/Services/Viewport/OscilloscopePlotPipeline.cs`
-5. `Worksheet.Core/Services/Viewport/PlotProcessor.cs`
-6. `Worksheet.Core/Services/Viewport/OscilloscopePlotProcessor.cs`
-7. `Worksheet.Core/Services/Viewport/Gates/GateProcessor.cs`
+1. `Worksheet.Processing/ProcessingEngine.cs`
+2. `Worksheet.Processing/PlotPipelineRegistry.cs`
+3. `Worksheet.Processing/ParameterPlotPipeline.cs`
+4. `Worksheet.Processing/OscilloscopePlotPipeline.cs`
+5. `Worksheet.Processing/PlotProcessor.cs`
+6. `Worksheet.Processing/OscilloscopePlotProcessor.cs`
+7. `Worksheet.Processing/Gates/GateProcessor.cs`
 
 For rendering and blitting:
 

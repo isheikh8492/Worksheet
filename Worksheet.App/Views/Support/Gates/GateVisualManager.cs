@@ -5,12 +5,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Models.Gates;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Gates;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.PlotViews.Gates;
 
-namespace Worksheet.Views.Support.Gates
+using Worksheet.App.Models;
+namespace Worksheet.App.Views.Support.Gates
 {
     /// <summary>
     /// Coordinates a plot's gates: owns the gate collection, hosts the overlay + interaction

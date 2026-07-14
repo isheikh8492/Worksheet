@@ -1,4 +1,4 @@
-namespace Worksheet.Models
+namespace Worksheet.Core.Models
 {
     /// <summary>
     /// Settings for an oscilloscope ("scope") plot: a set of analog channels drawn as

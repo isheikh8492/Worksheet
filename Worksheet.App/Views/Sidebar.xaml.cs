@@ -13,10 +13,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
-using Worksheet.Models.Gates;
-using Worksheet.Services;
+using Worksheet.Core.Models.Gates;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
 
-namespace Worksheet.Views
+namespace Worksheet.App.Views
 {
     /// <summary>
     /// Interaction logic for Sidebar.xaml

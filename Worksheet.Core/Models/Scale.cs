@@ -1,6 +1,6 @@
 using System;
 
-namespace Worksheet.Models
+namespace Worksheet.Core.Models
 {
     /// <summary>
     /// Maps a data value onto a plot's bin axis. A scale is built once for a given value range

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using ScottPlot;
 using ScottPlot.Plottables;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Views.PlotViews.ContextMenus;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.App.Views.ContextMenus;
 
-namespace Worksheet.Views.PlotViews
+namespace Worksheet.App.Views.PlotViews
 {
     public class OscilloscopePlotView : PlotView<ScopeSettings>
     {

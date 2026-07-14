@@ -5,15 +5,18 @@ using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Windows;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews;
-using Worksheet.Views.Support;
-using Worksheet.Views.Surfaces;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
+using Worksheet.App.Views.PlotViews;
+using Worksheet.App.Views.Support;
+using Worksheet.App.Views.Surfaces;
 using Xunit;
 using Xunit.Abstractions;
 
+using Worksheet.Core.Buffers;
 namespace Worksheet.Tests;
 
 public sealed class RenderingProfileTests

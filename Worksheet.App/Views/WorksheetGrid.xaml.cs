@@ -3,13 +3,17 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Collections.Generic;
 using System.Linq;
-using Worksheet.Models;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews;
-using Worksheet.Views.Support;
-using Worksheet.Models.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.PlotViews;
+using Worksheet.App.Views.Support;
+using Worksheet.Core.Models.Gates;
 
-namespace Worksheet.Views
+using Worksheet.Chasm;
+using Worksheet.App.Models;
+using Worksheet.App.Services.Viewport;
+namespace Worksheet.App.Views
 {
     public partial class WorksheetGrid : UserControl
     {
@@ -144,7 +148,7 @@ namespace Worksheet.Views
             }
             catch (Exception ex)
             {
-                Worksheet.Services.AppLog.Exception(ex, $"WorksheetGrid.AddPlot plotType={plotType}");
+                Worksheet.Core.Services.AppLog.Exception(ex, $"WorksheetGrid.AddPlot plotType={plotType}");
             }
         }
 
@@ -158,7 +162,7 @@ namespace Worksheet.Views
             }
             catch (Exception ex)
             {
-                Worksheet.Services.AppLog.Exception(ex, $"WorksheetGrid.AddPlot plotType={plotType} axisScale={axisScale}");
+                Worksheet.Core.Services.AppLog.Exception(ex, $"WorksheetGrid.AddPlot plotType={plotType} axisScale={axisScale}");
             }
         }
 
@@ -426,7 +430,7 @@ namespace Worksheet.Views
             }
             catch (Exception ex)
             {
-                Worksheet.Services.AppLog.Exception(ex, $"WorksheetGrid.AddPlot plotType={settings?.PlotType} plotId={settings?.Id}");
+                Worksheet.Core.Services.AppLog.Exception(ex, $"WorksheetGrid.AddPlot plotType={settings?.PlotType} plotId={settings?.Id}");
             }
         }
 

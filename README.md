@@ -20,16 +20,20 @@ The app is currently oriented around simulated acquisition through the in-repo `
 
 ## Tech Stack
 
-- `net8.0-windows`
+- `net8.0` (`Worksheet.Core`, `Worksheet.Chasm`, `Worksheet.Processing`) and `net8.0-windows` (`Worksheet.App`)
 - WPF
 - [ScottPlot.WPF](https://scottplot.net/)
 - `MathNet.Numerics`
 
 ## Repository Layout
 
-- `Worksheet.App/`: WPF application, views, render orchestration, and app startup
-- `Worksheet.Core/`: domain models, CHASM acquisition, buffering, processing, gates, and logging
-- `Worksheet.Tests/`: focused tests for Core behavior
+Five projects, layered with a strict one-way dependency direction (`Core` depends on nothing; `Chasm` and `Processing` are sibling adapters that meet only through Core's ports, composed in `App`):
+
+- `Worksheet.Core/`: domain models & DTOs, shared data-buffer contracts (`Buffers/`), and core services (logging, channel config); no dependencies
+- `Worksheet.Chasm/`: ingestion runtime — producers, `ChasmEngine`, the `DataSource` ring buffer, `ChasmDataSource` → Core
+- `Worksheet.Processing/`: viewport engine — plot processors, pipelines, `GateProcessor` → Core
+- `Worksheet.App/`: WPF application, views, render orchestration, app startup, composition root → Core, Chasm, Processing
+- `Worksheet.Tests/`: focused tests across the solution
 - `docs/`: architecture notes, audits, coding standards, and research writeups
 
 ## Getting Started
@@ -239,7 +243,7 @@ Important semantics:
 - `DynamicBitmap.PresentBitmap(...)` blits BGRA pixel buffers into a `WriteableBitmap` with `WritePixels(...)`.
 - Oscilloscope plots draw selected waveform channels as ScottPlot signal plottables instead of using the bitmap blit path.
 
-Default mock acquisition settings come from `Worksheet.Core/Services/CHASM/ChasmOptions.cs`:
+Default mock acquisition settings come from `Worksheet.Chasm/ChasmOptions.cs`:
 
 - Acquisition interval: `25 ms`
 - Batch size: `500`

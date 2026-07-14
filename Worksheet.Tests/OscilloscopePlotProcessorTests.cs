@@ -1,8 +1,11 @@
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Services;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 
+using Worksheet.Core.Buffers;
 namespace Worksheet.Tests;
 
 public sealed class OscilloscopePlotProcessorTests

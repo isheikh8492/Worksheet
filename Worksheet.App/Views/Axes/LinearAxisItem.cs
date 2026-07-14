@@ -1,9 +1,9 @@
 using System;
 using ScottPlot.WPF;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 using System.Collections.Generic;
 
-namespace Worksheet.Views.PlotViews.Axes
+namespace Worksheet.App.Views.Axes
 {
     public class LinearAxisItem : AxisItem
     {

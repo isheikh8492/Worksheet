@@ -1,6 +1,6 @@
 using System;
 
-namespace Worksheet.Models.Gates
+namespace Worksheet.Core.Models.Gates
 {
     public sealed class GateResult
     {

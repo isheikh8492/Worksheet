@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Worksheet.Models.Gates;
+using Worksheet.Core.Models.Gates;
 
-namespace Worksheet.Views.PlotViews.Gates
+namespace Worksheet.App.Views.PlotViews.Gates
 {
     public sealed class PolygonGate : GateBase
     {

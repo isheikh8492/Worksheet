@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Models.Gates;
-using Worksheet.Views.PlotViews.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Gates;
+using Worksheet.App.Views.PlotViews.Gates;
 
-namespace Worksheet.Views.Support.Gates
+namespace Worksheet.App.Views.Support.Gates
 {
     /// <summary>
     /// The gate input state machine. Translates mouse events into selection, drag-resize/move

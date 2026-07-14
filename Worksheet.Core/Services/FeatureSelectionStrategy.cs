@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 
-namespace Worksheet.Services
+namespace Worksheet.Core.Services
 {
     public class FeatureSelectionStrategy
     {

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Windows;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 
-namespace Worksheet.Views.PlotViews.Dialogs
+namespace Worksheet.App.Views.Dialogs
 {
     public partial class PseudocolorPropertiesDialog : Window
     {

@@ -1,4 +1,4 @@
-namespace Worksheet.Models
+namespace Worksheet.Core.Models
 {
     /// <summary>
     /// Base for parameter-based plots (histogram, pseudocolor, spectral ribbon) that bin

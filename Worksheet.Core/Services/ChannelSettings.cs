@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 
-namespace Worksheet.Services
+namespace Worksheet.Core.Services
 {
     public class ChannelSettings
     {

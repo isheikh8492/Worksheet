@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
-namespace Worksheet.Services
+namespace Worksheet.Core.Services
 {
     // Minimal file logger to capture exceptions without introducing external dependencies.
     public static class AppLog

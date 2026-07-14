@@ -1,4 +1,4 @@
-namespace Worksheet.Models
+namespace Worksheet.Core.Models
 {
     /// <summary>
     /// Settings for a 1D histogram plot: a single feature binned along the X (value) axis.

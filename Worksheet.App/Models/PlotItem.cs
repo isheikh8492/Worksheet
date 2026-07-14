@@ -3,9 +3,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using ScottPlot.WPF;
-using Worksheet.Views.PlotViews;
+using Worksheet.App.Views.PlotViews;
 
-namespace Worksheet.Models
+using Worksheet.App.Models;
+namespace Worksheet.App.Models
 {
     /// <summary>
     /// A worksheet item containing a ScottPlot chart.

@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Worksheet.Models;
-using Worksheet.Services;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 using Xunit.Abstractions;
 

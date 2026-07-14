@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using ScottPlot.WPF;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 
-namespace Worksheet.Views.PlotViews.Axes
+namespace Worksheet.App.Views.Axes
 {
     public class AxisFactory
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using Worksheet.Models.Gates;
-using Worksheet.Views.PlotViews.Gates;
+using Worksheet.Core.Models.Gates;
+using Worksheet.App.Views.PlotViews.Gates;
 using Xunit;
 
 namespace Worksheet.Tests;

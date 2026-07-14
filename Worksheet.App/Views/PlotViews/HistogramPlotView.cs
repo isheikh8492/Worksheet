@@ -1,13 +1,15 @@
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Models.Gates;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews.Axes;
-using Worksheet.Views.PlotViews.ContextMenus;
-using Worksheet.Views.Support.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Models.Gates;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.Axes;
+using Worksheet.App.Views.ContextMenus;
+using Worksheet.App.Views.Support.Gates;
 
-namespace Worksheet.Views.PlotViews
+using Worksheet.App.Models;
+namespace Worksheet.App.Views.PlotViews
 {
     public class HistogramPlotView : PlotView<HistogramSettings>
     {

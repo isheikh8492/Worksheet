@@ -1,6 +1,6 @@
 using System;
 
-namespace Worksheet.Models
+namespace Worksheet.Core.Models
 {
     public readonly record struct SignalLayout
     {

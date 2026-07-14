@@ -3,10 +3,11 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Windows;
-using Worksheet.Services;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
 using System.Threading.Tasks;
 
-namespace Worksheet
+namespace Worksheet.App
 {
     /// <summary>
     /// Interaction logic for App.xaml

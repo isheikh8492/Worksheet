@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using ScottPlot.WPF;
 
-namespace Worksheet.Views.PlotViews.Axes
+namespace Worksheet.App.Views.Axes
 {
     internal sealed class HistogramYAxisItem
     {

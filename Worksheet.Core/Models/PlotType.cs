@@ -1,4 +1,4 @@
-namespace Worksheet.Models
+namespace Worksheet.Core.Models
 {
     public enum PlotType
     {

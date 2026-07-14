@@ -1,9 +1,10 @@
 ﻿using System.Windows;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 using System;
 using System.Windows.Threading;
 
-namespace Worksheet.Views
+using Worksheet.Processing;
+namespace Worksheet.App.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

@@ -1,5 +1,5 @@
 using System;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 using Xunit;
 
 namespace Worksheet.Tests;

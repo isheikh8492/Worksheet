@@ -2,14 +2,15 @@ using System;
 using System.Linq;
 using ScottPlot.Interactivity.UserActionResponses;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews;
-using Worksheet.Views.PlotViews.Axes;
-using Worksheet.Views.PlotViews.ContextMenus;
-using Worksheet.Views.Support.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.PlotViews;
+using Worksheet.App.Views.Axes;
+using Worksheet.App.Views.ContextMenus;
+using Worksheet.App.Views.Support.Gates;
 
-namespace Worksheet.Views.Support
+namespace Worksheet.App.Views.Support
 {
     public class PlotFactory
     {
@@ -71,7 +72,7 @@ namespace Worksheet.Views.Support
             catch (Exception ex)
             {
                 // Avoid crashing if a view's Configure() has an issue.
-                Worksheet.Services.AppLog.Exception(ex, $"PlotFactory.Configure plotType={plotType} plotId={settings.Id}");
+                Worksheet.Core.Services.AppLog.Exception(ex, $"PlotFactory.Configure plotType={plotType} plotId={settings.Id}");
             }
 
             return plot;
@@ -99,7 +100,7 @@ namespace Worksheet.Views.Support
             catch (Exception ex)
             {
                 // Avoid crashing if a view's Configure() has an issue.
-                Worksheet.Services.AppLog.Exception(ex, $"PlotFactory.Configure plotType={plotType} plotId={settings.Id} axisScale={axisScale}");
+                Worksheet.Core.Services.AppLog.Exception(ex, $"PlotFactory.Configure plotType={plotType} plotId={settings.Id} axisScale={axisScale}");
             }
 
             return plot;

@@ -2,13 +2,14 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Views.Surfaces;
-using Worksheet.Views.PlotViews.ContextMenus;
-using Worksheet.Views.Support;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.App.Views.Surfaces;
+using Worksheet.App.Views.ContextMenus;
+using Worksheet.App.Views.Support;
 
-namespace Worksheet.Views.PlotViews
+using Worksheet.App.Models;
+namespace Worksheet.App.Views.PlotViews
 {
     public abstract class PlotView
     {

@@ -1,4 +1,4 @@
-namespace Worksheet.Models
+namespace Worksheet.Core.Models
 {
     /// <summary>
     /// Settings for a spectral ribbon plot: all configured channels are laid out along the X

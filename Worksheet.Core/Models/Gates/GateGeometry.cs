@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Worksheet.Models.Gates
+namespace Worksheet.Core.Models.Gates
 {
     public readonly record struct Point01(double X01, double Y01);
 

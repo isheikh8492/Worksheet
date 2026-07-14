@@ -1,9 +1,9 @@
 using ScottPlot.WPF;
 using System;
 using System.Collections.Generic;
-using Worksheet.Models.Gates;
+using Worksheet.Core.Models.Gates;
 
-namespace Worksheet.Views.PlotViews.Gates
+namespace Worksheet.App.Views.PlotViews.Gates
 {
     /// <summary>A draggable edit-handle on a gate. <see cref="Id"/> is meaningful only to the gate that produced it.</summary>
     public readonly record struct GateHandle(ScottPlot.Coordinates Position, int Id);

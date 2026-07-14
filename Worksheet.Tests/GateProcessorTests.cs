@@ -1,9 +1,11 @@
-using Worksheet.Models;
-using Worksheet.Models.Gates;
-using Worksheet.Services;
-using Worksheet.Services.Viewport.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Gates;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 
+using Worksheet.Processing.Gates;
 namespace Worksheet.Tests;
 
 public sealed class GateProcessorTests

@@ -1,6 +1,6 @@
 using System;
 
-namespace Worksheet.Models
+namespace Worksheet.Core.Models
 {
     /// <summary>
     /// Base configuration shared by every worksheet plot. Concrete plot types derive

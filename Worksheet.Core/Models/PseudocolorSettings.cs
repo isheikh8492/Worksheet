@@ -1,4 +1,4 @@
-namespace Worksheet.Models
+namespace Worksheet.Core.Models
 {
     /// <summary>
     /// Settings for a 2D pseudocolor (density) plot: two features binned on the X and Y

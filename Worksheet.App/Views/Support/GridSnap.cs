@@ -1,6 +1,6 @@
 using System;
 
-namespace Worksheet.Views.Support
+namespace Worksheet.App.Views.Support
 {
     /// <summary>Snaps a coordinate to the nearest half-grid increment.</summary>
     internal static class GridSnap

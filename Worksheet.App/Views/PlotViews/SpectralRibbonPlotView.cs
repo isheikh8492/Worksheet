@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews.Axes;
-using Worksheet.Views.PlotViews.ContextMenus;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.Axes;
+using Worksheet.App.Views.ContextMenus;
 
-namespace Worksheet.Views.PlotViews
+namespace Worksheet.App.Views.PlotViews
 {
     public class SpectralRibbonPlotView : PlotView<SpectralRibbonSettings>
     {

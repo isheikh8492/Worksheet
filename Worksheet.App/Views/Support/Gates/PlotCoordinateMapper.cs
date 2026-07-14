@@ -1,7 +1,7 @@
 using System.Windows;
 using ScottPlot.WPF;
 
-namespace Worksheet.Views.Support.Gates
+namespace Worksheet.App.Views.Support.Gates
 {
     /// <summary>
     /// Converts between mouse DIP points and plot data coordinates for a single plot,

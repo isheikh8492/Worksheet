@@ -1,6 +1,7 @@
 using System.Windows.Controls;
 
-namespace Worksheet.Models
+using Worksheet.App.Models;
+namespace Worksheet.App.Models
 {
     public interface IWorksheetItem
     {
