@@ -2,7 +2,7 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Worksheet.Views.Support
+namespace Worksheet.App.Views.Support
 {
     public readonly record struct DpiContext(double ScaleX, double ScaleY)
     {

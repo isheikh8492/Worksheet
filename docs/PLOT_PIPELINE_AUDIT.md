@@ -20,9 +20,9 @@ This audit covers the current processing/rendering path for:
 
 `DataSource.GetSnapshot(...)` returns references to the internal retained channel arrays. The metadata is captured under lock, but the arrays remain live after the lock is released.
 
-- `Worksheet.Core/Services/Viewport/DataSource.cs`
-- `Worksheet.Core/Services/Viewport/ChannelWindowSnapshot.cs`
-- `Worksheet.Core/Services/Viewport/MultiChannelWindowSnapshot.cs`
+- `Worksheet.Chasm/DataSource.cs`
+- `Worksheet.Core/Buffers/ChannelWindowSnapshot.cs`
+- `Worksheet.Core/Buffers/MultiChannelWindowSnapshot.cs`
 
 Impact:
 
@@ -51,8 +51,8 @@ Use live snapshots for hot plot processors by default. Use copied snapshots only
 
 Files:
 
-- `Worksheet.Core/Services/Viewport/ProcessingEngine.cs`
-- `Worksheet.Core/Services/Viewport/PlotProcessor.cs`
+- `Worksheet.Processing/ProcessingEngine.cs`
+- `Worksheet.Processing/PlotProcessor.cs`
 
 Impact:
 
@@ -71,7 +71,7 @@ The old design allocated more transient heatmap state. Current `PlotProcessor` k
 
 File:
 
-- `Worksheet.Core/Services/Viewport/PlotProcessor.cs`
+- `Worksheet.Processing/PlotProcessor.cs`
 
 Impact:
 
@@ -108,8 +108,8 @@ Impact:
 
 Gate processing has its own processor and cached state. It is still keyed by gate geometry, plot settings, and data version.
 
-- `Worksheet.Core/Services/Viewport/ProcessingEngine.cs`
-- `Worksheet.Core/Services/Viewport/Gates/GateProcessor.cs`
+- `Worksheet.Processing/ProcessingEngine.cs`
+- `Worksheet.Processing/Gates/GateProcessor.cs`
 
 Impact:
 
@@ -120,7 +120,7 @@ Impact:
 
 Metrics can be reset from the app/session surface, but they are still cumulative averages after reset rather than rolling-window percentiles.
 
-- `Worksheet.Core/Services/Viewport/ProcessingEngine.cs`
+- `Worksheet.Processing/ProcessingEngine.cs`
 - `Worksheet.App/Services/Viewport/RenderingEngine.cs`
 - `Worksheet.App/Services/Viewport/ViewportSession.cs`
 

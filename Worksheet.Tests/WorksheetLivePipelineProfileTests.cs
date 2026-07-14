@@ -8,14 +8,17 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using Worksheet.Models;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews;
-using Worksheet.Views.Support;
-using Worksheet.Views.Surfaces;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
+using Worksheet.App.Views.PlotViews;
+using Worksheet.App.Views.Support;
+using Worksheet.App.Views.Surfaces;
 using Xunit;
 using Xunit.Abstractions;
 
+using Worksheet.App.Services.Viewport;
 namespace Worksheet.Tests;
 
 public sealed class WorksheetLivePipelineProfileTests
@@ -99,7 +102,8 @@ public sealed class WorksheetLivePipelineProfileTests
         RegisterPlot(session, factory, PlotType.SpectralRibbon, dataWidth: 890, dataHeight: 210);
         RegisterPlot(session, factory, PlotType.Oscilloscope, dataWidth: 470, dataHeight: 210, settings =>
         {
-            settings.OscilloscopeChannelIndices = new[] { 0, 1, 2, 3 };
+            if (settings is ScopeSettings scope)
+                scope.ChannelIndices = new[] { 0, 1, 2, 3 };
         });
     }
 

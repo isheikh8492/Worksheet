@@ -1,19 +1,20 @@
 using System;
 using System.Collections.Generic;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews.Axes;
-using Worksheet.Views.PlotViews.ContextMenus;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.Axes;
+using Worksheet.App.Views.ContextMenus;
 
-namespace Worksheet.Views.PlotViews
+namespace Worksheet.App.Views.PlotViews
 {
-    public class SpectralRibbonPlotView : PlotView
+    public class SpectralRibbonPlotView : PlotView<SpectralRibbonSettings>
     {
         private SpectralConfigSnapshot? _lastAppliedConfig;
 
-        public SpectralRibbonPlotView(SpectralRibbonPlotContextMenu contextMenu, PlotSettings settings)
+        public SpectralRibbonPlotView(SpectralRibbonPlotContextMenu contextMenu, SpectralRibbonSettings settings)
             : base(contextMenu, settings)
         {
         }
@@ -111,7 +112,7 @@ namespace Worksheet.Views.PlotViews
             for (int i = 0; i <= channelCount; i++)
                 minorPositions[i] = i;
 
-            var tickGen = new FixedLinearTickGenerator(
+            var tickGen = new FixedTickGenerator(
                 positions,
                 labels,
                 minorPositions);
@@ -136,12 +137,12 @@ namespace Worksheet.Views.PlotViews
         {
             switch (Settings.YAxisScaleType)
             {
-                case AxisScaleType.Linear:
+                case ScaleType.Linear:
                     plot.Plot.Axes.Left.TickGenerator = LinearAxisItem.CreateDataTickGenerator(Settings);
                     if (resetLimits)
                         plot.Plot.Axes.SetLimitsY(0, bins);
                     break;
-                case AxisScaleType.Logarithmic:
+                case ScaleType.Logarithmic:
                     plot.Plot.Axes.Left.TickGenerator = LogarithmicAxisItem.CreateDataTickGenerator(Settings);
                     if (resetLimits)
                         plot.Plot.Axes.SetLimitsY(0, bins);
@@ -154,11 +155,11 @@ namespace Worksheet.Views.PlotViews
         private readonly record struct SpectralConfigSnapshot(
             int Bins,
             int ChannelCount,
-            AxisScaleType YAxisScaleType,
+            ScaleType YAxisScaleType,
             double MinValue,
             double MaxValue)
         {
-            public static SpectralConfigSnapshot Create(PlotSettings settings, int bins, int channelCount) =>
+            public static SpectralConfigSnapshot Create(SpectralRibbonSettings settings, int bins, int channelCount) =>
                 new(
                     bins,
                     channelCount,

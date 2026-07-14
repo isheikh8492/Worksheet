@@ -2,14 +2,15 @@ using System;
 using System.Linq;
 using ScottPlot.Interactivity.UserActionResponses;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews;
-using Worksheet.Views.PlotViews.Axes;
-using Worksheet.Views.PlotViews.ContextMenus;
-using Worksheet.Views.Support.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.PlotViews;
+using Worksheet.App.Views.Axes;
+using Worksheet.App.Views.ContextMenus;
+using Worksheet.App.Views.Support.Gates;
 
-namespace Worksheet.Views.Support
+namespace Worksheet.App.Views.Support
 {
     public class PlotFactory
     {
@@ -71,18 +72,26 @@ namespace Worksheet.Views.Support
             catch (Exception ex)
             {
                 // Avoid crashing if a view's Configure() has an issue.
-                Worksheet.Services.AppLog.Exception(ex, $"PlotFactory.Configure plotType={plotType} plotId={settings.Id}");
+                Worksheet.Core.Services.AppLog.Exception(ex, $"PlotFactory.Configure plotType={plotType} plotId={settings.Id}");
             }
 
             return plot;
         }
 
-        public WpfPlot CreatePlot(double width, double height, PlotType plotType, AxisScaleType axisScale, out PlotView plotView)
+        public WpfPlot CreatePlot(double width, double height, PlotType plotType, ScaleType axisScale, out PlotView plotView)
         {
             var plot = CreateBasePlot(width, height);
 
             var settings = CreateSettings(plotType);
-            settings.XAxisScaleType = axisScale;
+            switch (settings)
+            {
+                case HistogramSettings histogram:
+                    histogram.XAxisScaleType = axisScale;
+                    break;
+                case PseudocolorSettings pseudocolor:
+                    pseudocolor.XAxisScaleType = axisScale;
+                    break;
+            }
             plotView = CreatePlotView(plotType, settings);
             try
             {
@@ -91,7 +100,7 @@ namespace Worksheet.Views.Support
             catch (Exception ex)
             {
                 // Avoid crashing if a view's Configure() has an issue.
-                Worksheet.Services.AppLog.Exception(ex, $"PlotFactory.Configure plotType={plotType} plotId={settings.Id} axisScale={axisScale}");
+                Worksheet.Core.Services.AppLog.Exception(ex, $"PlotFactory.Configure plotType={plotType} plotId={settings.Id} axisScale={axisScale}");
             }
 
             return plot;
@@ -104,7 +113,7 @@ namespace Worksheet.Views.Support
             return CreatePlot(width, height, plotType, out plotView);
         }
 
-        public WpfPlot CreatePlot(PlotType plotType, AxisScaleType axisScale, out PlotView plotView)
+        public WpfPlot CreatePlot(PlotType plotType, ScaleType axisScale, out PlotView plotView)
         {
             var (width, height) = GetDefaultSize(plotType);
             return CreatePlot(width, height, plotType, axisScale, out plotView);
@@ -119,55 +128,39 @@ namespace Worksheet.Views.Support
         {
             return plotType switch
             {
-                PlotType.Histogram => new PlotSettings
+                PlotType.Histogram => new HistogramSettings
                 {
-                    PlotType = PlotType.Histogram,
                     BinCount = 256,
                     XFeature = 0,
-                    YFeature = 0,
-                    XAxisScaleType = AxisScaleType.Logarithmic,
-                    YAxisScaleType = AxisScaleType.Linear
+                    XAxisScaleType = ScaleType.Logarithmic
                 },
-                PlotType.Pseudocolor => new PlotSettings
+                PlotType.Pseudocolor => new PseudocolorSettings
                 {
-                    PlotType = PlotType.Pseudocolor,
                     BinCount = 256,
                     XFeature = 0,
                     YFeature = 1,
-                    XAxisScaleType = AxisScaleType.Logarithmic,
-                    YAxisScaleType = AxisScaleType.Logarithmic
+                    XAxisScaleType = ScaleType.Logarithmic,
+                    YAxisScaleType = ScaleType.Logarithmic
                 },
-                PlotType.SpectralRibbon => new PlotSettings
+                PlotType.SpectralRibbon => new SpectralRibbonSettings
                 {
-                    PlotType = PlotType.SpectralRibbon,
                     BinCount = 256,
-                    XFeature = 0,
-                    YFeature = 0,
-                    XAxisScaleType = AxisScaleType.Linear,
-                    YAxisScaleType = AxisScaleType.Logarithmic
+                    YAxisScaleType = ScaleType.Logarithmic
                 },
-                PlotType.Oscilloscope => new PlotSettings
-                {
-                    PlotType = PlotType.Oscilloscope,
-                    BinCount = 1750,
-                    XFeature = 0,
-                    YFeature = 0,
-                    XAxisScaleType = AxisScaleType.Linear,
-                    YAxisScaleType = AxisScaleType.Linear
-                },
+                PlotType.Oscilloscope => new ScopeSettings(),
                 _ => throw new ArgumentOutOfRangeException(nameof(plotType), plotType, "Unsupported plot type.")
             };
         }
 
         public PlotView CreatePlotView(PlotType plotType, PlotSettings settings)
         {
-            return plotType switch
+            return settings switch
             {
-                PlotType.Histogram => new HistogramPlotView(_histogramContextMenu, _axisFactory, settings, new GateVisualManager()),
-                PlotType.Pseudocolor => new PseudocolorPlotView(_pseudocolorContextMenu, settings, new GateVisualManager()),
-                PlotType.SpectralRibbon => new SpectralRibbonPlotView(_spectralRibbonContextMenu, settings),
-                PlotType.Oscilloscope => new OscilloscopePlotView(_oscilloscopeContextMenu, settings),
-                _ => throw new ArgumentOutOfRangeException(nameof(plotType), plotType, "Unsupported plot type.")
+                HistogramSettings histogram => new HistogramPlotView(_histogramContextMenu, _axisFactory, histogram, new GateVisualManager()),
+                PseudocolorSettings pseudocolor => new PseudocolorPlotView(_pseudocolorContextMenu, pseudocolor, new GateVisualManager()),
+                SpectralRibbonSettings spectral => new SpectralRibbonPlotView(_spectralRibbonContextMenu, spectral),
+                ScopeSettings scope => new OscilloscopePlotView(_oscilloscopeContextMenu, scope),
+                _ => throw new ArgumentOutOfRangeException(nameof(settings), plotType, "Unsupported plot type.")
             };
         }
 

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace Worksheet.Models.Gates
+namespace Worksheet.Core.Models.Gates
 {
     public readonly record struct GateAxisStatistics(double Mean, double Std, double Var, double CvPercent);
 

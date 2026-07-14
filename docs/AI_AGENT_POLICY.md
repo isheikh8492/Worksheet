@@ -14,12 +14,13 @@ If either document conflicts with direct user instructions, user instructions wi
 ## Repository Context
 
 - Stack: `C#`, `WPF`, `ScottPlot.WPF` (v5), `MathNet.Numerics`
-- Target framework: `net8.0-windows`
-- Main folders:
-  - `Models/`
-  - `Services/`
-  - `Views/`
-  - `docs/`
+- Target frameworks: `net8.0` for `Worksheet.Core`/`Worksheet.Chasm`/`Worksheet.Processing`; `net8.0-windows` for `Worksheet.App`
+- Projects (strict one-way deps; see `CODING_STANDARDS.md` for detail):
+  - `Worksheet.Core` — models, DTOs, buffer contracts (`Buffers/`), core services; no dependencies
+  - `Worksheet.Chasm` — ingestion runtime (producers, `ChasmEngine`, `DataSource`) → Core
+  - `Worksheet.Processing` — viewport engine (processors, pipelines, `GateProcessor`) → Core
+  - `Worksheet.App` — WPF UI + composition root → Core, Chasm, Processing
+  - `Worksheet.Tests` → all
 
 ## Agent Behavior Rules
 
@@ -33,10 +34,10 @@ If either document conflicts with direct user instructions, user instructions wi
 
 Treat these as hot paths:
 
-- `Services/Viewport/PlotProcessor.cs`
-- `Services/Viewport/Gates/GateProcessor.cs`
-- `Views/PlotViews/*` render/update code
-- timer-driven engines in `Services/Viewport/*Engine.cs`
+- `Worksheet.Processing/PlotProcessor.cs`
+- `Worksheet.Processing/Gates/GateProcessor.cs`
+- `Worksheet.App/Views/PlotViews/*` render/update code
+- timer-driven engines: `Worksheet.Processing/ProcessingEngine.cs`, `Worksheet.App/Services/Viewport/RenderingEngine.cs`
 
 In these areas:
 

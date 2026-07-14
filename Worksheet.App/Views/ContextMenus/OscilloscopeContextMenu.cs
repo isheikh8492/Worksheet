@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Worksheet.Models;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews;
-using Worksheet.Views.PlotViews.Dialogs;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.PlotViews;
+using Worksheet.App.Views.Dialogs;
 
-namespace Worksheet.Views.PlotViews.ContextMenus
+using Worksheet.App.Models;
+namespace Worksheet.App.Views.ContextMenus
 {
     public class OscilloscopeContextMenu : PlotContextMenu
     {
@@ -39,11 +41,11 @@ namespace Worksheet.Views.PlotViews.ContextMenus
 
         private static void OpenProperties(PlotItem plotItem, OscilloscopePlotView oscilloscopeView)
         {
-            var selected = oscilloscopeView.Settings.OscilloscopeChannelIndices;
+            var selected = oscilloscopeView.Settings.ChannelIndices;
             int maxSelectedIndex = selected.Length > 0 ? selected.Max() : 0;
             var configuredChannelNames = FeatureSelectionStrategy.AllChannelNames;
             int channelCount = Math.Max(
-                Math.Max(oscilloscopeView.Settings.OscilloscopeChannelCount, configuredChannelNames.Count),
+                Math.Max(oscilloscopeView.Settings.ChannelCount, configuredChannelNames.Count),
                 maxSelectedIndex + 1);
 
             var channelLabels = BuildChannelLabels(channelCount, configuredChannelNames);
@@ -54,8 +56,8 @@ namespace Worksheet.Views.PlotViews.ContextMenus
 
             if (dialog.ShowDialog() == true)
             {
-                oscilloscopeView.Settings.OscilloscopeChannelIndices = dialog.SelectedChannelIndices;
-                oscilloscopeView.Settings.OscilloscopeChannelCount = Math.Max(channelCount, dialog.SelectedChannelIndices.Max() + 1);
+                oscilloscopeView.Settings.ChannelIndices = dialog.SelectedChannelIndices;
+                oscilloscopeView.Settings.ChannelCount = Math.Max(channelCount, dialog.SelectedChannelIndices.Max() + 1);
                 oscilloscopeView.InvalidateStatic(plotItem.Plot);
             }
         }

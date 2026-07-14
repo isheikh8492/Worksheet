@@ -3,11 +3,13 @@ using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Windows;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Services;
-using Worksheet.Views.Support;
-using Worksheet.Views.Surfaces;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
+using Worksheet.App.Views.Support;
+using Worksheet.App.Views.Surfaces;
 using Xunit;
 
 namespace Worksheet.Tests;
@@ -124,24 +126,22 @@ public sealed class DpiAwarenessTests
     }
 
     private static PlotSettings CreatePseudocolorSettings() =>
-        new()
+        new PseudocolorSettings
         {
-            PlotType = PlotType.Pseudocolor,
             BinCount = 64,
             XFeature = 0,
             YFeature = 1,
-            XAxisScaleType = AxisScaleType.Linear,
-            YAxisScaleType = AxisScaleType.Linear,
+            XAxisScaleType = ScaleType.Linear,
+            YAxisScaleType = ScaleType.Linear,
             MinValue = 1,
             MaxValue = 100,
         };
 
     private static PlotSettings CreateSpectralRibbonSettings() =>
-        new()
+        new SpectralRibbonSettings
         {
-            PlotType = PlotType.SpectralRibbon,
             BinCount = 64,
-            YAxisScaleType = AxisScaleType.Linear,
+            YAxisScaleType = ScaleType.Linear,
             MinValue = 1,
             MaxValue = 100,
         };

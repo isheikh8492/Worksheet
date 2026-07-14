@@ -2,13 +2,14 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Views.Surfaces;
-using Worksheet.Views.PlotViews.ContextMenus;
-using Worksheet.Views.Support;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.App.Views.Surfaces;
+using Worksheet.App.Views.ContextMenus;
+using Worksheet.App.Views.Support;
 
-namespace Worksheet.Views.PlotViews
+using Worksheet.App.Models;
+namespace Worksheet.App.Views.PlotViews
 {
     public abstract class PlotView
     {
@@ -166,5 +167,19 @@ namespace Worksheet.Views.PlotViews
 
             plot.Refresh();
         }
+    }
+
+    /// <summary>
+    /// A plot view strongly typed to its own settings. Exposes <see cref="Settings"/> as the
+    /// concrete settings type so each view sees only the configuration it owns.
+    /// </summary>
+    public abstract class PlotView<TSettings> : PlotView where TSettings : PlotSettings
+    {
+        protected PlotView(PlotContextMenu contextMenu, TSettings settings)
+            : base(contextMenu, settings)
+        {
+        }
+
+        public new TSettings Settings => (TSettings)base.Settings;
     }
 }

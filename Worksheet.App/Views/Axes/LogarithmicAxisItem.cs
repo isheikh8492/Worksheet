@@ -1,14 +1,14 @@
 using System;
 using ScottPlot.WPF;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 
-namespace Worksheet.Views.PlotViews.Axes
+namespace Worksheet.App.Views.Axes
 {
     public class LogarithmicAxisItem : AxisItem
     {
-        public override AxisScaleType ScaleType => AxisScaleType.Logarithmic;
+        public override ScaleType ScaleType => ScaleType.Logarithmic;
 
-        public override void Apply(WpfPlot plot, PlotSettings settings, AxisOrientation orientation)
+        public override void Apply(WpfPlot plot, ParameterPlotSettings settings, AxisOrientation orientation)
         {
             if (orientation == AxisOrientation.Bottom)
             {
@@ -20,7 +20,7 @@ namespace Worksheet.Views.PlotViews.Axes
             }
         }
 
-        private static void ApplyBottom(WpfPlot plot, PlotSettings settings)
+        private static void ApplyBottom(WpfPlot plot, ParameterPlotSettings settings)
         {
             plot.Plot.Axes.Bottom.TickGenerator = CreateDataTickGenerator(settings);
             plot.Plot.Grid.MajorLineColor = ScottPlot.Colors.Black.WithOpacity(.15);
@@ -38,15 +38,16 @@ namespace Worksheet.Views.PlotViews.Axes
             };
         }
 
-        internal static FixedLogTickGenerator CreateDataTickGenerator(PlotSettings settings)
+        internal static FixedTickGenerator CreateDataTickGenerator(ParameterPlotSettings settings)
         {
+            var scale = new LogScale(settings.MinValue, settings.MaxValue, settings.GetBinCount());
             var positions = new double[9];
             var labels = new string[9];
 
             for (int i = 0; i <= 8; i++)
             {
                 var value = Math.Pow(10, i);
-                positions[i] = settings.DataValueToBinPosition(value, AxisScaleType.Logarithmic);
+                positions[i] = scale.ToPosition(value);
                 labels[i] = FormatLogLabel(i);
             }
 
@@ -57,11 +58,11 @@ namespace Worksheet.Views.PlotViews.Axes
                 for (int m = 2; m <= 9; m++)
                 {
                     double minorValue = decadeStart * m;
-                    minorPositions.Add(settings.DataValueToBinPosition(minorValue, AxisScaleType.Logarithmic));
+                    minorPositions.Add(scale.ToPosition(minorValue));
                 }
             }
 
-            return new FixedLogTickGenerator(positions, labels, minorPositions.ToArray());
+            return new FixedTickGenerator(positions, labels, minorPositions.ToArray());
         }
 
         internal static string FormatLogLabel(int exponent)
@@ -83,23 +84,6 @@ namespace Worksheet.Views.PlotViews.Axes
                 result += superscripts[digit - '0'];
             }
             return result;
-        }
-
-        internal static string FormatSIPrefix(double value)
-        {
-            if (value == 0) return "0";
-
-            double absValue = Math.Abs(value);
-            string sign = value < 0 ? "-" : "";
-
-            if (absValue >= 1_000_000_000)
-                return $"{sign}{absValue / 1_000_000_000:0.##}G";
-            else if (absValue >= 1_000_000)
-                return $"{sign}{absValue / 1_000_000:0.##}M";
-            else if (absValue >= 1_000)
-                return $"{sign}{absValue / 1_000:0.##}k";
-            else
-                return $"{sign}{absValue:0.##}";
         }
     }
 }

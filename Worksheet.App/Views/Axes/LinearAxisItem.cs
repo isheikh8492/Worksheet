@@ -1,15 +1,15 @@
 using System;
 using ScottPlot.WPF;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 using System.Collections.Generic;
 
-namespace Worksheet.Views.PlotViews.Axes
+namespace Worksheet.App.Views.Axes
 {
     public class LinearAxisItem : AxisItem
     {
-        public override AxisScaleType ScaleType => AxisScaleType.Linear;
+        public override ScaleType ScaleType => ScaleType.Linear;
 
-        public override void Apply(WpfPlot plot, PlotSettings settings, AxisOrientation orientation)
+        public override void Apply(WpfPlot plot, ParameterPlotSettings settings, AxisOrientation orientation)
         {
             if (orientation == AxisOrientation.Bottom)
             {
@@ -21,7 +21,7 @@ namespace Worksheet.Views.PlotViews.Axes
             }
         }
 
-        private static void ApplyBottom(WpfPlot plot, PlotSettings settings)
+        private static void ApplyBottom(WpfPlot plot, ParameterPlotSettings settings)
         {
             plot.Plot.Axes.Bottom.TickGenerator = CreateDataTickGenerator(settings);
 
@@ -40,15 +40,16 @@ namespace Worksheet.Views.PlotViews.Axes
             };
         }
 
-        internal static FixedLinearTickGenerator CreateDataTickGenerator(PlotSettings settings)
+        internal static FixedTickGenerator CreateDataTickGenerator(ParameterPlotSettings settings)
         {
+            var scale = new LinearScale(settings.MinValue, settings.MaxValue, settings.GetBinCount());
             var majorValues = new double[] { 0, 20_000_000, 40_000_000, 60_000_000, 80_000_000, 100_000_000 };
             var majorPositions = new double[majorValues.Length];
             var majorLabels = new string[majorValues.Length];
 
             for (int i = 0; i < majorValues.Length; i++)
             {
-                majorPositions[i] = settings.DataValueToBinPosition(majorValues[i], AxisScaleType.Linear);
+                majorPositions[i] = scale.ToPosition(majorValues[i]);
                 majorLabels[i] = FormatSIPrefix(majorValues[i]);
             }
 
@@ -61,28 +62,11 @@ namespace Worksheet.Views.PlotViews.Axes
                 for (int j = 1; j <= 4; j++)
                 {
                     double minorValue = start + step * j;
-                    minorPositions.Add(settings.DataValueToBinPosition(minorValue, AxisScaleType.Linear));
+                    minorPositions.Add(scale.ToPosition(minorValue));
                 }
             }
 
-            return new FixedLinearTickGenerator(majorPositions, majorLabels, minorPositions.ToArray());
-        }
-
-        internal static string FormatSIPrefix(double value)
-        {
-            if (value == 0) return "0";
-
-            double absValue = Math.Abs(value);
-            string sign = value < 0 ? "-" : "";
-
-            if (absValue >= 1_000_000_000)
-                return $"{sign}{absValue / 1_000_000_000:0.##}G";
-            else if (absValue >= 1_000_000)
-                return $"{sign}{absValue / 1_000_000:0.##}M";
-            else if (absValue >= 1_000)
-                return $"{sign}{absValue / 1_000:0.##}k";
-            else
-                return $"{sign}{absValue:0.##}";
+            return new FixedTickGenerator(majorPositions, majorLabels, minorPositions.ToArray());
         }
     }
 }

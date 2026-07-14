@@ -5,15 +5,18 @@ using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Windows;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews;
-using Worksheet.Views.Support;
-using Worksheet.Views.Surfaces;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
+using Worksheet.App.Views.PlotViews;
+using Worksheet.App.Views.Support;
+using Worksheet.App.Views.Surfaces;
 using Xunit;
 using Xunit.Abstractions;
 
+using Worksheet.Core.Buffers;
 namespace Worksheet.Tests;
 
 public sealed class RenderingProfileTests
@@ -177,35 +180,32 @@ public sealed class RenderingProfileTests
     }
 
     private static PlotSettings CreateHistogramSettings() =>
-        new()
+        new HistogramSettings
         {
-            PlotType = PlotType.Histogram,
             BinCount = 256,
             XFeature = 0,
-            XAxisScaleType = AxisScaleType.Logarithmic,
+            XAxisScaleType = ScaleType.Logarithmic,
             MinValue = 1,
             MaxValue = 100_000_000,
         };
 
     private static PlotSettings CreatePseudocolorSettings() =>
-        new()
+        new PseudocolorSettings
         {
-            PlotType = PlotType.Pseudocolor,
             BinCount = 256,
             XFeature = 0,
             YFeature = 1,
-            XAxisScaleType = AxisScaleType.Logarithmic,
-            YAxisScaleType = AxisScaleType.Logarithmic,
+            XAxisScaleType = ScaleType.Logarithmic,
+            YAxisScaleType = ScaleType.Logarithmic,
             MinValue = 1,
             MaxValue = 100_000_000,
         };
 
     private static PlotSettings CreateSpectralRibbonSettings() =>
-        new()
+        new SpectralRibbonSettings
         {
-            PlotType = PlotType.SpectralRibbon,
             BinCount = 256,
-            YAxisScaleType = AxisScaleType.Logarithmic,
+            YAxisScaleType = ScaleType.Logarithmic,
             MinValue = 1,
             MaxValue = 100_000_000,
         };

@@ -1,12 +1,14 @@
 using System;
 using System.Windows.Threading;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Services;
-using Worksheet.Models.Gates;
-using Worksheet.Services.Viewport.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Core.Models.Gates;
 
-namespace Worksheet.Services
+using Worksheet.Chasm;
+using Worksheet.Processing.Gates;
+namespace Worksheet.App.Services.Viewport
 {
     public class ViewportSession : IDisposable
     {
@@ -15,7 +17,7 @@ namespace Worksheet.Services
         private readonly DataSource _dataSource;
         private readonly OscilloscopeBuffer _oscilloscopeBuffer;
         private readonly ChasmDataSource _chasmDataSource;
-        private readonly Chasm _chasm;
+        private readonly ChasmEngine _chasm;
         private readonly PlotProcessor _plotProcessor;
         private readonly OscilloscopePlotProcessor _oscilloscopePlotProcessor;
         private readonly GateProcessor _gateProcessor;
@@ -42,7 +44,7 @@ namespace Worksheet.Services
             _oscilloscopeBuffer = new OscilloscopeBuffer();
             var pipeline = ChasmPipelineFactory.CreateMock(_dataSource, _chasmOptions, _oscilloscopeBuffer);
             _chasmDataSource = pipeline.ChasmDataSource;
-            _chasm = pipeline.Chasm;
+            _chasm = pipeline.ChasmEngine;
 
             _plotProcessor = new PlotProcessor(_chasmDataSource);
             _oscilloscopePlotProcessor = new OscilloscopePlotProcessor(_oscilloscopeBuffer);

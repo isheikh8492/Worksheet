@@ -1,6 +1,8 @@
 using System;
 using System.IO;
-using Worksheet.Services;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 
 namespace Worksheet.Tests;

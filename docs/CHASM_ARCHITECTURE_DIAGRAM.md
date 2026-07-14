@@ -691,18 +691,18 @@ Start here:
 1. `Worksheet.App/Services/Viewport/ViewportSession.cs`
    - Builds the whole runtime graph.
    - Starts/stops CHASM, processing, and rendering.
-2. `Worksheet.Core/Services/CHASM/Chasm.cs`
+2. `Worksheet.Chasm/ChasmEngine.cs`
    - Owns streaming lifecycle.
    - Starts producer and consumer.
-3. `Worksheet.Core/Services/CHASM/MockProducer.cs`
+3. `Worksheet.Chasm/MockProducer.cs`
    - Creates event batches.
    - Writes them into `Channel<IEventBatch>`.
-4. `Worksheet.Core/Services/CHASM/ChasmConsumer.cs`
+4. `Worksheet.Chasm/ChasmConsumer.cs`
    - Reads from the channel.
    - Calls append on the data source adapter.
-5. `Worksheet.Core/Services/CHASM/ChasmDataSource.cs`
+5. `Worksheet.Chasm/ChasmDataSource.cs`
    - Chooses jagged vs flat append path.
-6. `Worksheet.Core/Services/Viewport/DataSource.cs`
+6. `Worksheet.Chasm/DataSource.cs`
    - Owns the rolling raw-event window.
    - Serves snapshots to processors.
 7. `Worksheet.Core/Models/SignalLayout.cs`

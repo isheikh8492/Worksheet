@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-namespace Worksheet.Views.Support
+namespace Worksheet.App.Views.Support
 {
     public class SelectionManager<T> where T : class
     {

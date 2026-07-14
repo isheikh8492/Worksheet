@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using ScottPlot.WPF;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 
-namespace Worksheet.Views.PlotViews.Axes
+namespace Worksheet.App.Views.Axes
 {
     public class AxisFactory
     {
-        private readonly Dictionary<AxisScaleType, AxisItem> _items;
+        private readonly Dictionary<ScaleType, AxisItem> _items;
 
         public AxisFactory()
             : this(new LinearAxisItem(), new LogarithmicAxisItem())
@@ -16,14 +16,14 @@ namespace Worksheet.Views.PlotViews.Axes
 
         public AxisFactory(LinearAxisItem linearAxisItem, LogarithmicAxisItem logarithmicAxisItem)
         {
-            _items = new Dictionary<AxisScaleType, AxisItem>
+            _items = new Dictionary<ScaleType, AxisItem>
             {
                 { linearAxisItem.ScaleType, linearAxisItem },
                 { logarithmicAxisItem.ScaleType, logarithmicAxisItem }
             };
         }
 
-        public AxisItem Get(AxisScaleType scaleType)
+        public AxisItem Get(ScaleType scaleType)
         {
             if (_items.TryGetValue(scaleType, out var item))
                 return item;
@@ -31,7 +31,7 @@ namespace Worksheet.Views.PlotViews.Axes
             throw new ArgumentOutOfRangeException(nameof(scaleType), scaleType, "Unsupported axis scale type.");
         }
 
-        public void Apply(AxisScaleType scaleType, WpfPlot plot, PlotSettings settings)
+        public void Apply(ScaleType scaleType, WpfPlot plot, ParameterPlotSettings settings)
         {
             var item = Get(scaleType);
             item.Apply(plot, settings, AxisOrientation.Bottom);

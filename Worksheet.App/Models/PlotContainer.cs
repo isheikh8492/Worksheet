@@ -1,9 +1,10 @@
 using System.Windows.Controls;
 using ScottPlot.WPF;
 using System.Windows;
-using Worksheet.Views.Surfaces;
+using Worksheet.App.Views.Surfaces;
 
-namespace Worksheet.Models
+using Worksheet.App.Models;
+namespace Worksheet.App.Models
 {
     /// <summary>
     /// Contains all the UI elements that make up a draggable, resizable plot on the worksheet.

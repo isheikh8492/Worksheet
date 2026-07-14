@@ -1,17 +1,19 @@
 using System;
 using System.Linq;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Models.Gates;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews.Axes;
-using Worksheet.Views.PlotViews.ContextMenus;
-using Worksheet.Views.Support.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Models.Gates;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.Axes;
+using Worksheet.App.Views.ContextMenus;
+using Worksheet.App.Views.Support.Gates;
 
-namespace Worksheet.Views.PlotViews
+using Worksheet.App.Models;
+namespace Worksheet.App.Views.PlotViews
 {
-    public class PseudocolorPlotView : PlotView
+    public class PseudocolorPlotView : PlotView<PseudocolorSettings>
     {
         private readonly GateVisualManager _gateVisualManager;
         private PlotConfigSnapshot? _lastAppliedConfig;
@@ -21,7 +23,7 @@ namespace Worksheet.Views.PlotViews
 
         public PseudocolorPlotView(
             PseudocolorPlotContextMenu contextMenu,
-            PlotSettings settings,
+            PseudocolorSettings settings,
             GateVisualManager gateVisualManager)
             : base(contextMenu, settings)
         {
@@ -136,16 +138,16 @@ namespace Worksheet.Views.PlotViews
         private static void ApplyAxisTicks(
             WpfPlot plot,
             AxisOrientation orientation,
-            AxisScaleType scaleType,
-            PlotSettings settings,
+            ScaleType scaleType,
+            ParameterPlotSettings settings,
             bool resetLimits)
         {
             switch (scaleType)
             {
-                case AxisScaleType.Linear:
+                case ScaleType.Linear:
                     ApplyLinearTicks(plot, orientation, settings, resetLimits);
                     break;
-                case AxisScaleType.Logarithmic:
+                case ScaleType.Logarithmic:
                     ApplyLogarithmicTicks(plot, orientation, settings, resetLimits);
                     break;
                 default:
@@ -153,7 +155,7 @@ namespace Worksheet.Views.PlotViews
             }
         }
 
-        private static void ApplyLinearTicks(WpfPlot plot, AxisOrientation orientation, PlotSettings settings, bool resetLimits)
+        private static void ApplyLinearTicks(WpfPlot plot, AxisOrientation orientation, ParameterPlotSettings settings, bool resetLimits)
         {
             var tickGen = LinearAxisItem.CreateDataTickGenerator(settings);
             if (orientation == AxisOrientation.Bottom)
@@ -171,7 +173,7 @@ namespace Worksheet.Views.PlotViews
 
         }
 
-        private static void ApplyLogarithmicTicks(WpfPlot plot, AxisOrientation orientation, PlotSettings settings, bool resetLimits)
+        private static void ApplyLogarithmicTicks(WpfPlot plot, AxisOrientation orientation, ParameterPlotSettings settings, bool resetLimits)
         {
             var tickGen = LogarithmicAxisItem.CreateDataTickGenerator(settings);
             if (orientation == AxisOrientation.Bottom)
@@ -193,12 +195,12 @@ namespace Worksheet.Views.PlotViews
             int BinCount,
             int XFeature,
             int YFeature,
-            AxisScaleType XAxisScaleType,
-            AxisScaleType YAxisScaleType,
+            ScaleType XAxisScaleType,
+            ScaleType YAxisScaleType,
             double MinValue,
             double MaxValue)
         {
-            public static PlotConfigSnapshot From(PlotSettings settings) =>
+            public static PlotConfigSnapshot From(PseudocolorSettings settings) =>
                 new(
                     settings.GetBinCount(),
                     settings.XFeature,

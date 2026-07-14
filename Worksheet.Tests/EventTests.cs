@@ -1,8 +1,11 @@
 using System;
-using Worksheet.Models;
-using Worksheet.Services;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 
+using Worksheet.Core.Buffers;
 namespace Worksheet.Tests;
 
 public sealed class EventTests
@@ -10,9 +13,9 @@ public sealed class EventTests
     [Fact]
     public void PlotSettingsDefaultOscilloscopeChannelCountMatchesConnectedEventShape()
     {
-        var settings = new PlotSettings { PlotType = PlotType.Oscilloscope };
+        var settings = new ScopeSettings();
 
-        Assert.Equal(51, settings.OscilloscopeChannelCount);
+        Assert.Equal(51, settings.ChannelCount);
     }
 
     [Fact]

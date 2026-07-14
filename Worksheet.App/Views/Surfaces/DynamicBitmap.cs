@@ -4,9 +4,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Worksheet.Views.Support;
+using Worksheet.App.Views.Support;
 
-namespace Worksheet.Views.Surfaces
+namespace Worksheet.App.Views.Surfaces
 {
     public sealed class DynamicBitmap : Image
     {

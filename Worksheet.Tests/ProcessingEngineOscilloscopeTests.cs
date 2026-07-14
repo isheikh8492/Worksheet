@@ -1,10 +1,13 @@
 using System;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Services;
-using Worksheet.Services.Viewport.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 
+using Worksheet.Processing.Gates;
+using Worksheet.Core.Buffers;
 namespace Worksheet.Tests;
 
 public sealed class ProcessingEngineOscilloscopeTests
@@ -21,10 +24,9 @@ public sealed class ProcessingEngineOscilloscopeTests
             new PlotProcessor(chasmDataSource),
             new GateProcessor(chasmDataSource),
             oscilloscopeBuffer);
-        var settings = new PlotSettings
+        var settings = new ScopeSettings
         {
-            PlotType = PlotType.Oscilloscope,
-            OscilloscopeChannelIndices = [0],
+            ChannelIndices = [0],
         };
         dataStore.UpsertSettings(settings);
 
@@ -56,15 +58,13 @@ public sealed class ProcessingEngineOscilloscopeTests
             new PlotProcessor(chasmDataSource),
             new GateProcessor(chasmDataSource),
             oscilloscopeBuffer);
-        var histogramSettings = new PlotSettings
+        var histogramSettings = new HistogramSettings
         {
-            PlotType = PlotType.Histogram,
             XFeature = 0,
         };
-        var scopeSettings = new PlotSettings
+        var scopeSettings = new ScopeSettings
         {
-            PlotType = PlotType.Oscilloscope,
-            OscilloscopeChannelIndices = [0],
+            ChannelIndices = [0],
         };
         dataStore.UpsertSettings(histogramSettings);
         dataStore.UpsertSettings(scopeSettings);

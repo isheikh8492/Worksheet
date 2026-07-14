@@ -1,8 +1,9 @@
-using Worksheet.Models;
-using Worksheet.Views.PlotViews;
-using Worksheet.Views.PlotViews.Dialogs;
+using Worksheet.Core.Models;
+using Worksheet.App.Views.PlotViews;
+using Worksheet.App.Views.Dialogs;
 
-namespace Worksheet.Views.PlotViews.ContextMenus
+using Worksheet.App.Models;
+namespace Worksheet.App.Views.ContextMenus
 {
     public class SpectralRibbonPlotContextMenu : PlotContextMenu
     {

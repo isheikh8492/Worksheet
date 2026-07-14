@@ -2,9 +2,11 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Services;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -114,35 +116,32 @@ public sealed class ProcessingProfileTests
     }
 
     private static PlotSettings CreateHistogramSettings() =>
-        new()
+        new HistogramSettings
         {
-            PlotType = PlotType.Histogram,
             BinCount = 256,
             XFeature = 0,
-            XAxisScaleType = AxisScaleType.Logarithmic,
+            XAxisScaleType = ScaleType.Logarithmic,
             MinValue = 1,
             MaxValue = 100_000_000,
         };
 
     private static PlotSettings CreatePseudocolorSettings() =>
-        new()
+        new PseudocolorSettings
         {
-            PlotType = PlotType.Pseudocolor,
             BinCount = 256,
             XFeature = 0,
             YFeature = 1,
-            XAxisScaleType = AxisScaleType.Logarithmic,
-            YAxisScaleType = AxisScaleType.Logarithmic,
+            XAxisScaleType = ScaleType.Logarithmic,
+            YAxisScaleType = ScaleType.Logarithmic,
             MinValue = 1,
             MaxValue = 100_000_000,
         };
 
     private static PlotSettings CreateSpectralRibbonSettings() =>
-        new()
+        new SpectralRibbonSettings
         {
-            PlotType = PlotType.SpectralRibbon,
             BinCount = 256,
-            YAxisScaleType = AxisScaleType.Logarithmic,
+            YAxisScaleType = ScaleType.Logarithmic,
             MinValue = 1,
             MaxValue = 100_000_000,
         };

@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Worksheet.Views
+namespace Worksheet.App.Views
 {
     /// <summary>
     /// Interaction logic for Toolbar.xaml

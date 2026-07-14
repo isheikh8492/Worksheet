@@ -3,7 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Worksheet.Views.PlotViews.Dialogs
+namespace Worksheet.App.Views.Dialogs
 {
     public partial class OscilloscopePropertiesDialog : Window
     {

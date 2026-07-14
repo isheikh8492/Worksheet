@@ -2,7 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Worksheet.Services;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 
 namespace Worksheet.Tests;
@@ -15,7 +17,7 @@ public sealed class ChasmLifecycleTests
         var producer = new RecordingProducer();
         var consumer = new RecordingConsumer();
         var dataSource = new ChasmDataSource(new DataSource());
-        using var chasm = new Chasm(producer, consumer, dataSource);
+        using var chasm = new ChasmEngine(producer, consumer, dataSource);
 
         chasm.StartStreaming();
         await consumer.Started.Task.WaitAsync(TimeSpan.FromSeconds(1));

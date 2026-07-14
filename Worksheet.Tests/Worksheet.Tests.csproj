@@ -18,6 +18,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Worksheet.App\Worksheet.App.csproj" />
     <ProjectReference Include="..\Worksheet.Core\Worksheet.Core.csproj" />
+    <ProjectReference Include="..\Worksheet.Chasm\Worksheet.Chasm.csproj" />
+    <ProjectReference Include="..\Worksheet.Processing\Worksheet.Processing.csproj" />
   </ItemGroup>
 
 </Project>

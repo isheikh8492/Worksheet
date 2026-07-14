@@ -1,11 +1,13 @@
 using System.Windows.Controls;
 using System.Windows;
-using Worksheet.Models;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews;
-using Worksheet.Views.PlotViews.Dialogs;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.PlotViews;
+using Worksheet.App.Views.Dialogs;
 
-namespace Worksheet.Views.PlotViews.ContextMenus
+using Worksheet.App.Models;
+namespace Worksheet.App.Views.ContextMenus
 {
     public class HistogramPlotContextMenu : PlotContextMenu
     {

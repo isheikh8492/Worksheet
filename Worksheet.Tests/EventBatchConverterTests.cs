@@ -1,8 +1,11 @@
 using System.Threading.Channels;
-using Worksheet.Models;
-using Worksheet.Services;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 
+using Worksheet.Core.Buffers;
 namespace Worksheet.Tests;
 
 public sealed class EventBatchConverterTests

@@ -1,4 +1,4 @@
-namespace Worksheet.Views.PlotViews.Axes
+namespace Worksheet.App.Views.Axes
 {
     public enum AxisOrientation
     {

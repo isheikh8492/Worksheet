@@ -4,10 +4,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Views.Surfaces;
+using Worksheet.Core.Models;
+using Worksheet.App.Views.Surfaces;
 
-namespace Worksheet.Views.Support
+using Worksheet.App.Models;
+namespace Worksheet.App.Views.Support
 {
     public class PlotContainerFactory
     {

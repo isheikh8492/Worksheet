@@ -1,27 +1,27 @@
 using System.Collections.Generic;
 using System.Windows;
-using Worksheet.Models;
+using Worksheet.Core.Models;
 
-namespace Worksheet.Views.PlotViews.Dialogs
+namespace Worksheet.App.Views.Dialogs
 {
     public partial class PseudocolorPropertiesDialog : Window
     {
         public int SelectedXFeatureIndex { get; private set; }
         public int SelectedYFeatureIndex { get; private set; }
-        public AxisScaleType SelectedXAxisScale { get; private set; }
-        public AxisScaleType SelectedYAxisScale { get; private set; }
+        public ScaleType SelectedXAxisScale { get; private set; }
+        public ScaleType SelectedYAxisScale { get; private set; }
 
         public PseudocolorPropertiesDialog(
-            AxisScaleType currentXScale,
-            AxisScaleType currentYScale,
+            ScaleType currentXScale,
+            ScaleType currentYScale,
             IReadOnlyList<string> featureNames,
             int currentXFeatureIndex,
             int currentYFeatureIndex)
         {
             InitializeComponent();
 
-            XAxisScaleComboBox.ItemsSource = new[] { AxisScaleType.Linear, AxisScaleType.Logarithmic };
-            YAxisScaleComboBox.ItemsSource = new[] { AxisScaleType.Linear, AxisScaleType.Logarithmic };
+            XAxisScaleComboBox.ItemsSource = new[] { ScaleType.Linear, ScaleType.Logarithmic };
+            YAxisScaleComboBox.ItemsSource = new[] { ScaleType.Linear, ScaleType.Logarithmic };
             XAxisScaleComboBox.SelectedItem = currentXScale;
             YAxisScaleComboBox.SelectedItem = currentYScale;
 
@@ -46,8 +46,8 @@ namespace Worksheet.Views.PlotViews.Dialogs
 
         private void Ok_Click(object sender, RoutedEventArgs e)
         {
-            if (XAxisScaleComboBox.SelectedItem is AxisScaleType xScale &&
-                YAxisScaleComboBox.SelectedItem is AxisScaleType yScale &&
+            if (XAxisScaleComboBox.SelectedItem is ScaleType xScale &&
+                YAxisScaleComboBox.SelectedItem is ScaleType yScale &&
                 XFeatureComboBox.SelectedIndex >= 0 &&
                 YFeatureComboBox.SelectedIndex >= 0)
             {

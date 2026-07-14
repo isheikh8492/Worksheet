@@ -1,6 +1,6 @@
 # Coding Standards
 
-Repository-wide coding standards for `Worksheet` (`net8.0-windows`, WPF, ScottPlot 5).
+Repository-wide coding standards for the `Worksheet` solution. `Worksheet.Core`, `Worksheet.Chasm`, and `Worksheet.Processing` target `net8.0` (no UI); `Worksheet.App` targets `net8.0-windows` (WPF, ScottPlot 5).
 
 ## Core Principles
 
@@ -9,14 +9,19 @@ Repository-wide coding standards for `Worksheet` (`net8.0-windows`, WPF, ScottPl
 - Preserve behavior unless the task explicitly changes behavior.
 - Prefer deterministic, testable code over implicit side effects.
 
-## Project Structure
+## Solution Structure
 
-- `Models/`: domain and data transfer shapes.
-- `Services/`: streaming, processing, viewport engines, and business logic.
-- `Views/`: WPF UI, plot views, context menus, and interaction wiring.
-- `docs/`: repository policy and working agreements.
+Five projects, layered with a strict one-way dependency direction. Each project's root namespace equals its assembly name, and sub-namespaces mirror the folder tree.
 
-Do not move files across these boundaries without a clear reason.
+- **`Worksheet.Core`** (`net8.0`, no dependencies) — the pure leaf: domain models and DTOs (`Models/`, `Models/Data/`, `Models/Gates/`), the shared data-buffer contracts and shapes (`Buffers/`: `IChannelDataBuffer`, `IOscilloscopeBuffer`, the window snapshots, `AnalogCapture`), and cross-cutting services (`Services/`: `AppLog`, channel/feature configuration).
+- **`Worksheet.Chasm`** (`net8.0` → Core) — the ingestion runtime: producers, `ChasmEngine`, the consumer, the `DataSource` ring buffer, `ChasmDataSource`, the oscilloscope buffer, and event batches.
+- **`Worksheet.Processing`** (`net8.0` → Core) — the viewport engine: `PlotProcessor`, `ProcessingEngine`, plot pipelines, `GateProcessor`. Reads data only through Core's `IChannelDataBuffer` port — it never references `Worksheet.Chasm`.
+- **`Worksheet.App`** (`net8.0-windows`, WPF → Core, Chasm, Processing) — UI and composition root: views, plot views, context menus, dialogs, interaction wiring, and the WPF-thread engines (`RenderingEngine`, `ViewportSession`).
+- **`Worksheet.Tests`** → all.
+
+Dependency direction: `Core ← Chasm`, `Core ← Processing`, `Core, Chasm, Processing ← App`. `Core` depends on nothing; `Chasm` and `Processing` are sibling adapters that meet only through Core's ports (composed in `App`). Keep the graph acyclic.
+
+Do not move a type across a project boundary, or add a project reference, without a clear reason — in particular, never introduce a `Chasm ↔ Processing` dependency (route through a Core port instead).
 
 ## C# Conventions
 

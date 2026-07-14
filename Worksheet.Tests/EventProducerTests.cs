@@ -1,9 +1,12 @@
 using System;
 using System.Threading.Tasks;
-using Worksheet.Models;
-using Worksheet.Services;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 
+using Worksheet.Core.Buffers;
 namespace Worksheet.Tests;
 
 public sealed class EventProducerTests
@@ -138,7 +141,7 @@ public sealed class EventProducerTests
         var chasmSource = new ChasmDataSource(source);
         var producer = new EventProducer(layout, channelCapacityBatches: 4, maxBatchSize: 10);
         var consumer = new ChasmConsumer(producer.Reader, chasmSource);
-        using var chasm = new Chasm(producer, consumer, chasmSource);
+        using var chasm = new ChasmEngine(producer, consumer, chasmSource);
 
         chasm.StartStreaming();
         int written = producer.Publish(
@@ -169,7 +172,7 @@ public sealed class EventProducerTests
         var chasmSource = new ChasmDataSource(source);
         var producer = new EventProducer(layout, channelCapacityBatches: 4, maxBatchSize: 10);
         var consumer = new ChasmConsumer(producer.Reader, chasmSource);
-        using var chasm = new Chasm(producer, consumer, chasmSource);
+        using var chasm = new ChasmEngine(producer, consumer, chasmSource);
 
         chasm.StartStreaming();
         int written = producer.PublishColumnMajor(

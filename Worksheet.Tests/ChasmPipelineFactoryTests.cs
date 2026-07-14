@@ -1,7 +1,9 @@
 using System;
 using System.Threading.Tasks;
-using Worksheet.Models;
-using Worksheet.Services;
+using Worksheet.Core.Models;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 
 namespace Worksheet.Tests;
@@ -25,7 +27,7 @@ public sealed class ChasmPipelineFactoryTests
         Assert.Null(pipeline.IngestionPort);
         Assert.IsType<ChasmDataSource>(pipeline.ChasmDataSource);
 
-        pipeline.Chasm.Dispose();
+        pipeline.ChasmEngine.Dispose();
     }
 
     [Fact]
@@ -40,7 +42,7 @@ public sealed class ChasmPipelineFactoryTests
             ChannelCapacityBatches = 4,
         }, oscilloscopeBuffer);
 
-        using var chasm = pipeline.Chasm;
+        using var chasm = pipeline.ChasmEngine;
         var ingestion = Assert.IsAssignableFrom<IEventIngestionPort>(pipeline.IngestionPort);
 
         chasm.StartStreaming();

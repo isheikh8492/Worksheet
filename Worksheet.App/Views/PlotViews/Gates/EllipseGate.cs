@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
+using Worksheet.Core.Models.Gates;
 
-namespace Worksheet.Views.PlotViews.Gates
+namespace Worksheet.App.Views.PlotViews.Gates
 {
     public sealed class EllipseGate : GateBase
     {
@@ -10,6 +12,26 @@ namespace Worksheet.Views.PlotViews.Gates
             : base(gateId, name, xMin, xMax, yMin, yMax, style)
         {
         }
+
+        public override GateType GateType => GateType.Ellipse;
+
+        public override GateGeometry ToGeometry(int binCount)
+        {
+            double inv = binCount > 0 ? 1.0 / binCount : 1.0;
+            double cx = ((XMin + XMax) / 2.0) * inv;
+            double cy = ((YMin + YMax) / 2.0) * inv;
+            double rx = ((XMax - XMin) / 2.0) * inv;
+            double ry = ((YMax - YMin) / 2.0) * inv;
+            return GateGeometry.Ellipse01(cx, cy, rx, ry, angleDeg: 0);
+        }
+
+        public override IReadOnlyList<GateHandle> GetHandles() => new[]
+        {
+            new GateHandle(new ScottPlot.Coordinates(XMin, YMin), 0),
+            new GateHandle(new ScottPlot.Coordinates(XMax, YMin), 1),
+            new GateHandle(new ScottPlot.Coordinates(XMin, YMax), 2),
+            new GateHandle(new ScottPlot.Coordinates(XMax, YMax), 3),
+        };
 
         public override bool Contains(ScottPlot.Coordinates c)
         {

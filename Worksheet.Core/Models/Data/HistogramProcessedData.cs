@@ -1,12 +1,12 @@
 using System;
 
-namespace Worksheet.Models.Data
+namespace Worksheet.Core.Models.Data
 {
-    using Worksheet.Models;
+    using Worksheet.Core.Models;
 
     public class HistogramProcessedData : ProcessedPlotData
     {
-        public HistogramProcessedData(Guid plotId, double[] positions, double[] counts, int binCount, AxisScaleType scaleType)
+        public HistogramProcessedData(Guid plotId, double[] positions, double[] counts, int binCount, ScaleType scaleType)
             : base(plotId, PlotType.Histogram)
         {
             Positions = positions;
@@ -18,6 +18,6 @@ namespace Worksheet.Models.Data
         public double[] Positions { get; }
         public double[] Counts { get; }
         public int BinCount { get; }
-        public AxisScaleType ScaleType { get; }
+        public ScaleType ScaleType { get; }
     }
 }

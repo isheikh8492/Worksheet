@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Worksheet.Models.Data
+namespace Worksheet.Core.Models.Data
 {
-    using Worksheet.Models;
+    using Worksheet.Core.Models;
 
     public class SpectralRibbonProcessedData : ProcessedPlotData
     {

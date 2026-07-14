@@ -1,15 +1,17 @@
 using ScottPlot.WPF;
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Models.Gates;
-using Worksheet.Services;
-using Worksheet.Views.PlotViews.Axes;
-using Worksheet.Views.PlotViews.ContextMenus;
-using Worksheet.Views.Support.Gates;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Models.Gates;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.App.Views.Axes;
+using Worksheet.App.Views.ContextMenus;
+using Worksheet.App.Views.Support.Gates;
 
-namespace Worksheet.Views.PlotViews
+using Worksheet.App.Models;
+namespace Worksheet.App.Views.PlotViews
 {
-    public class HistogramPlotView : PlotView
+    public class HistogramPlotView : PlotView<HistogramSettings>
     {
         private readonly AxisFactory _axisFactory;
         private readonly GateVisualManager _gateVisualManager;
@@ -26,7 +28,7 @@ namespace Worksheet.Views.PlotViews
         public HistogramPlotView(
             HistogramPlotContextMenu contextMenu,
             AxisFactory axisFactory,
-            PlotSettings settings,
+            HistogramSettings settings,
             GateVisualManager gateVisualManager)
             : base(contextMenu, settings)
         {
@@ -36,7 +38,7 @@ namespace Worksheet.Views.PlotViews
 
         public override PlotType PlotType => PlotType.Histogram;
 
-        public AxisScaleType CurrentAxisScale => Settings.XAxisScaleType;
+        public ScaleType CurrentAxisScale => Settings.XAxisScaleType;
 
         public override void Configure(WpfPlot plot)
         {
@@ -89,7 +91,7 @@ namespace Worksheet.Views.PlotViews
             ExecuteStaticRefresh(plot);
         }
 
-        public void UpdateAxisScale(PlotItem plotItem, AxisScaleType newScale)
+        public void UpdateAxisScale(PlotItem plotItem, ScaleType newScale)
         {
             Settings.XAxisScaleType = newScale;
         }
@@ -215,11 +217,11 @@ namespace Worksheet.Views.PlotViews
         private readonly record struct HistogramConfigSnapshot(
             int BinCount,
             int XFeature,
-            AxisScaleType XAxisScaleType,
+            ScaleType XAxisScaleType,
             double MinValue,
             double MaxValue)
         {
-            public static HistogramConfigSnapshot From(PlotSettings settings) =>
+            public static HistogramConfigSnapshot From(HistogramSettings settings) =>
                 new(
                     settings.GetBinCount(),
                     settings.XFeature,

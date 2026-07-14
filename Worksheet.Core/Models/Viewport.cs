@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Worksheet.Models
+namespace Worksheet.Core.Models
 {
     public class Viewport
     {

@@ -1,8 +1,11 @@
-using Worksheet.Models;
-using Worksheet.Models.Data;
-using Worksheet.Services;
+using Worksheet.Core.Models;
+using Worksheet.Core.Models.Data;
+using Worksheet.Core.Services;
+using Worksheet.Processing;
+using Worksheet.Chasm;
 using Xunit;
 
+using Worksheet.Core.Buffers;
 namespace Worksheet.Tests;
 
 public sealed class OscilloscopePlotProcessorTests
@@ -11,7 +14,7 @@ public sealed class OscilloscopePlotProcessorTests
     public void ProcessReturnsEmptyDataWhenBufferIsEmpty()
     {
         var processor = new OscilloscopePlotProcessor(new OscilloscopeBuffer());
-        var settings = new PlotSettings { PlotType = PlotType.Oscilloscope };
+        var settings = new ScopeSettings();
 
         OscilloscopeProcessedData data = processor.Process(settings);
 
@@ -26,10 +29,9 @@ public sealed class OscilloscopePlotProcessorTests
     {
         var buffer = new OscilloscopeBuffer();
         var processor = new OscilloscopePlotProcessor(buffer);
-        var settings = new PlotSettings
+        var settings = new ScopeSettings
         {
-            PlotType = PlotType.Oscilloscope,
-            OscilloscopeChannelIndices = [1, 0],
+            ChannelIndices = [1, 0],
         };
         buffer.Publish(new AnalogCapture(
             [
@@ -54,7 +56,7 @@ public sealed class OscilloscopePlotProcessorTests
     {
         var buffer = new OscilloscopeBuffer(capacity: 3);
         var processor = new OscilloscopePlotProcessor(buffer);
-        var settings = new PlotSettings { PlotType = PlotType.Oscilloscope };
+        var settings = new ScopeSettings();
 
         buffer.Publish(new AnalogCapture([1, 2], channelCount: 1, timestampCount: 2));
         buffer.Publish(new AnalogCapture([3, 4], channelCount: 1, timestampCount: 2));
@@ -72,10 +74,9 @@ public sealed class OscilloscopePlotProcessorTests
     {
         var buffer = new OscilloscopeBuffer();
         var processor = new OscilloscopePlotProcessor(buffer);
-        var settings = new PlotSettings
+        var settings = new ScopeSettings
         {
-            PlotType = PlotType.Oscilloscope,
-            OscilloscopeChannelIndices = [-1, 1, 7],
+            ChannelIndices = [-1, 1, 7],
         };
         buffer.Publish(new AnalogCapture(
             [
