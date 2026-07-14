@@ -77,7 +77,7 @@ namespace Worksheet.Views.Support
             return plot;
         }
 
-        public WpfPlot CreatePlot(double width, double height, PlotType plotType, AxisScaleType axisScale, out PlotView plotView)
+        public WpfPlot CreatePlot(double width, double height, PlotType plotType, ScaleType axisScale, out PlotView plotView)
         {
             var plot = CreateBasePlot(width, height);
 
@@ -112,7 +112,7 @@ namespace Worksheet.Views.Support
             return CreatePlot(width, height, plotType, out plotView);
         }
 
-        public WpfPlot CreatePlot(PlotType plotType, AxisScaleType axisScale, out PlotView plotView)
+        public WpfPlot CreatePlot(PlotType plotType, ScaleType axisScale, out PlotView plotView)
         {
             var (width, height) = GetDefaultSize(plotType);
             return CreatePlot(width, height, plotType, axisScale, out plotView);
@@ -131,20 +131,20 @@ namespace Worksheet.Views.Support
                 {
                     BinCount = 256,
                     XFeature = 0,
-                    XAxisScaleType = AxisScaleType.Logarithmic
+                    XAxisScaleType = ScaleType.Logarithmic
                 },
                 PlotType.Pseudocolor => new PseudocolorSettings
                 {
                     BinCount = 256,
                     XFeature = 0,
                     YFeature = 1,
-                    XAxisScaleType = AxisScaleType.Logarithmic,
-                    YAxisScaleType = AxisScaleType.Logarithmic
+                    XAxisScaleType = ScaleType.Logarithmic,
+                    YAxisScaleType = ScaleType.Logarithmic
                 },
                 PlotType.SpectralRibbon => new SpectralRibbonSettings
                 {
                     BinCount = 256,
-                    YAxisScaleType = AxisScaleType.Logarithmic
+                    YAxisScaleType = ScaleType.Logarithmic
                 },
                 PlotType.Oscilloscope => new ScopeSettings(),
                 _ => throw new ArgumentOutOfRangeException(nameof(plotType), plotType, "Unsupported plot type.")

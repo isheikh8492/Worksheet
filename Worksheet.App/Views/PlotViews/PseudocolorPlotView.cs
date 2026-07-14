@@ -136,16 +136,16 @@ namespace Worksheet.Views.PlotViews
         private static void ApplyAxisTicks(
             WpfPlot plot,
             AxisOrientation orientation,
-            AxisScaleType scaleType,
+            ScaleType scaleType,
             ParameterPlotSettings settings,
             bool resetLimits)
         {
             switch (scaleType)
             {
-                case AxisScaleType.Linear:
+                case ScaleType.Linear:
                     ApplyLinearTicks(plot, orientation, settings, resetLimits);
                     break;
-                case AxisScaleType.Logarithmic:
+                case ScaleType.Logarithmic:
                     ApplyLogarithmicTicks(plot, orientation, settings, resetLimits);
                     break;
                 default:
@@ -193,8 +193,8 @@ namespace Worksheet.Views.PlotViews
             int BinCount,
             int XFeature,
             int YFeature,
-            AxisScaleType XAxisScaleType,
-            AxisScaleType YAxisScaleType,
+            ScaleType XAxisScaleType,
+            ScaleType YAxisScaleType,
             double MinValue,
             double MaxValue)
         {

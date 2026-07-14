@@ -73,45 +73,11 @@ namespace Worksheet.Services
             }
         }
 
-        private static (double scale, double offset, bool isLog, double effMin, double effMax) BuildBinTransform(
-            ParameterPlotSettings settings, AxisScaleType scaleType)
-        {
-            double min = settings.MinValue;
-            double max = settings.MaxValue;
-            int bins = settings.GetBinCount();
-
-            if (scaleType == AxisScaleType.Logarithmic)
-            {
-                if (min < 1) min = 1;
-                if (max <= min) max = min * 10;
-                double minLog = Math.Log10(min);
-                double maxLog = Math.Log10(max);
-                double scale = bins / (maxLog - minLog);
-                double offset = -minLog * scale;
-                return (scale, offset, true, min, max);
-            }
-
-            if (max <= min) max = min + 1;
-            double linearScale = bins / (max - min);
-            double linearOffset = -min * linearScale;
-            return (linearScale, linearOffset, false, min, max);
-        }
-
-        private static int ToBin(double value, double scale, double offset, bool isLog,
-            int bins, double effMin, double effMax)
-        {
-            if (value < effMin) value = effMin;
-            else if (value > effMax) value = effMax;
-
-            double pos = isLog ? Math.Log10(value) * scale + offset : value * scale + offset;
-            return Math.Clamp((int)pos, 0, bins - 1);
-        }
-
         private ProcessedPlotData ProcessHistogram(HistogramSettings settings)
         {
             ChannelWindowSnapshot snapshot = _buffer.GetSnapshot(settings.XFeature);
             int bins = settings.GetBinCount();
-            var (scale, offset, isLog, effMin, effMax) = BuildBinTransform(settings, settings.XAxisScaleType);
+            Scale scale = Scale.Create(settings.XAxisScaleType, settings.MinValue, settings.MaxValue, bins);
 
             HistogramProcessingState state;
             lock (_stateLock)
@@ -140,7 +106,7 @@ namespace Worksheet.Services
                     RecordSequenceGap();
 
                 state.ClearData(snapshot.StartSequence);
-                ApplyHistogramRange(state, snapshot, snapshot.StartSequence, snapshot.EndSequence, scale, offset, isLog, bins, effMin, effMax);
+                ApplyHistogramRange(state, snapshot, snapshot.StartSequence, snapshot.EndSequence, scale);
                 state.LastProcessedSequence = snapshot.EndSequence;
                 RecordFullRebuild();
             }
@@ -149,7 +115,7 @@ namespace Worksheet.Services
                 long fromSequence = state.LastProcessedSequence;
                 if (fromSequence < snapshot.EndSequence)
                 {
-                    ApplyHistogramRange(state, snapshot, fromSequence, snapshot.EndSequence, scale, offset, isLog, bins, effMin, effMax);
+                    ApplyHistogramRange(state, snapshot, fromSequence, snapshot.EndSequence, scale);
                     state.LastProcessedSequence = snapshot.EndSequence;
                     RecordDeltaApplied(snapshot.EndSequence - fromSequence);
                 }
@@ -160,7 +126,7 @@ namespace Worksheet.Services
             return BuildHistogramData(settings.Id, state.Counts, bins, settings.XAxisScaleType);
         }
 
-        private static HistogramProcessedData BuildHistogramData(Guid plotId, double[] counts, int bins, AxisScaleType scaleType)
+        private static HistogramProcessedData BuildHistogramData(Guid plotId, double[] counts, int bins, ScaleType scaleType)
         {
             var outCounts = new double[bins];
             Array.Copy(counts, outCounts, bins);
@@ -177,18 +143,13 @@ namespace Worksheet.Services
             ChannelWindowSnapshot snapshot,
             long fromSequence,
             long toSequence,
-            double scale,
-            double offset,
-            bool isLog,
-            int bins,
-            double effMin,
-            double effMax)
+            Scale scale)
         {
             for (long sequence = fromSequence; sequence < toSequence; sequence++)
             {
                 int physicalIndex = snapshot.PhysicalIndexForSequence(sequence);
                 double value = snapshot.Values[physicalIndex];
-                int bin = ToBin(value, scale, offset, isLog, bins, effMin, effMax);
+                int bin = scale.ToBin(value);
                 state.Counts[bin]++;
                 AppendHistogramContribution(state, bin);
             }
@@ -227,8 +188,8 @@ namespace Worksheet.Services
             int pixelWidth = targetSize.HasPixels ? targetSize.PixelWidth : bins;
             int pixelHeight = targetSize.HasPixels ? targetSize.PixelHeight : bins;
             bool isEmpty = snapshot.Count <= 0;
-            var (xScale, xOffset, xIsLog, xEffMin, xEffMax) = BuildBinTransform(settings, settings.XAxisScaleType);
-            var (yScale, yOffset, yIsLog, yEffMin, yEffMax) = BuildBinTransform(settings, settings.YAxisScaleType);
+            Scale xScale = Scale.Create(settings.XAxisScaleType, settings.MinValue, settings.MaxValue, bins);
+            Scale yScale = Scale.Create(settings.YAxisScaleType, settings.MinValue, settings.MaxValue, bins);
 
             PseudocolorProcessingState state;
             lock (_stateLock)
@@ -258,7 +219,7 @@ namespace Worksheet.Services
                     RecordSequenceGap();
 
                 state.ClearData(snapshot.StartSequence);
-                ApplyPseudocolorRange(state, snapshot, snapshot.StartSequence, snapshot.EndSequence, xScale, xOffset, xIsLog, yScale, yOffset, yIsLog, bins, xEffMin, xEffMax, yEffMin, yEffMax);
+                ApplyPseudocolorRange(state, snapshot, snapshot.StartSequence, snapshot.EndSequence, xScale, yScale, bins);
                 state.LastProcessedSequence = snapshot.EndSequence;
                 RecordFullRebuild();
             }
@@ -267,7 +228,7 @@ namespace Worksheet.Services
                 long fromSequence = state.LastProcessedSequence;
                 if (fromSequence < snapshot.EndSequence)
                 {
-                    ApplyPseudocolorRange(state, snapshot, fromSequence, snapshot.EndSequence, xScale, xOffset, xIsLog, yScale, yOffset, yIsLog, bins, xEffMin, xEffMax, yEffMin, yEffMax);
+                    ApplyPseudocolorRange(state, snapshot, fromSequence, snapshot.EndSequence, xScale, yScale, bins);
                     state.LastProcessedSequence = snapshot.EndSequence;
                     RecordDeltaApplied(snapshot.EndSequence - fromSequence);
                 }
@@ -284,17 +245,9 @@ namespace Worksheet.Services
             MultiChannelWindowSnapshot snapshot,
             long fromSequence,
             long toSequence,
-            double xScale,
-            double xOffset,
-            bool xIsLog,
-            double yScale,
-            double yOffset,
-            bool yIsLog,
-            int bins,
-            double xEffMin,
-            double xEffMax,
-            double yEffMin,
-            double yEffMax)
+            Scale xScale,
+            Scale yScale,
+            int bins)
         {
             for (long sequence = fromSequence; sequence < toSequence; sequence++)
             {
@@ -302,8 +255,8 @@ namespace Worksheet.Services
                 int yPhysicalIndex = xPhysicalIndex;
                 double xv = snapshot.ChannelValues[0][xPhysicalIndex];
                 double yv = snapshot.ChannelValues[1][yPhysicalIndex];
-                int xBin = ToBin(xv, xScale, xOffset, xIsLog, bins, xEffMin, xEffMax);
-                int yBin = ToBin(yv, yScale, yOffset, yIsLog, bins, yEffMin, yEffMax);
+                int xBin = xScale.ToBin(xv);
+                int yBin = yScale.ToBin(yv);
                 int row = (bins - 1) - yBin;
                 state.RawCounts[row, xBin]++;
                 AppendPseudocolorContribution(state, row, xBin);
@@ -408,7 +361,7 @@ namespace Worksheet.Services
             }
 
             MultiChannelWindowSnapshot snapshot = _buffer.GetSnapshot(channelIndices.ToArray());
-            var (scale, offset, isLog, effMin, effMax) = BuildBinTransform(settings, settings.YAxisScaleType);
+            Scale scale = Scale.Create(settings.YAxisScaleType, settings.MinValue, settings.MaxValue, bins);
 
             int channelHash = ComputeChannelHash(channelIndices);
             SpectralRibbonProcessingState state;
@@ -439,7 +392,7 @@ namespace Worksheet.Services
                     RecordSequenceGap();
 
                 state.ClearData(snapshot.StartSequence);
-                ApplySpectralRange(state, snapshot, snapshot.StartSequence, snapshot.EndSequence, scale, offset, isLog, bins, effMin, effMax);
+                ApplySpectralRange(state, snapshot, snapshot.StartSequence, snapshot.EndSequence, scale, bins);
                 state.LastProcessedSequence = snapshot.EndSequence;
                 RecordFullRebuild();
             }
@@ -448,7 +401,7 @@ namespace Worksheet.Services
                 long fromSequence = state.LastProcessedSequence;
                 if (fromSequence < snapshot.EndSequence)
                 {
-                    ApplySpectralRange(state, snapshot, fromSequence, snapshot.EndSequence, scale, offset, isLog, bins, effMin, effMax);
+                    ApplySpectralRange(state, snapshot, fromSequence, snapshot.EndSequence, scale, bins);
                     state.LastProcessedSequence = snapshot.EndSequence;
                     RecordDeltaApplied(snapshot.EndSequence - fromSequence);
                 }
@@ -465,12 +418,8 @@ namespace Worksheet.Services
             MultiChannelWindowSnapshot snapshot,
             long fromSequence,
             long toSequence,
-            double scale,
-            double offset,
-            bool isLog,
-            int bins,
-            double effMin,
-            double effMax)
+            Scale scale,
+            int bins)
         {
             int channelCount = state.ChannelCount;
             for (long sequence = fromSequence; sequence < toSequence; sequence++)
@@ -483,7 +432,7 @@ namespace Worksheet.Services
                 for (int c = 0; c < channelCount; c++)
                 {
                     double value = snapshot.ChannelValues[c][physicalIndex];
-                    int bin = ToBin(value, scale, offset, isLog, bins, effMin, effMax);
+                    int bin = scale.ToBin(value);
                     int row = (bins - 1) - bin;
                     state.RawCounts[row, c]++;
                     state.RingRows[writeIndex, c] = (ushort)row;
@@ -623,7 +572,7 @@ namespace Worksheet.Services
 
         private sealed class HistogramProcessingState
         {
-            public HistogramProcessingState(Guid plotId, int binCount, int featureIndex, AxisScaleType axisScaleType, double minValue, double maxValue, int capacity)
+            public HistogramProcessingState(Guid plotId, int binCount, int featureIndex, ScaleType axisScaleType, double minValue, double maxValue, int capacity)
             {
                 PlotId = plotId;
                 Reset(binCount, featureIndex, axisScaleType, minValue, maxValue, capacity);
@@ -632,7 +581,7 @@ namespace Worksheet.Services
             public Guid PlotId { get; }
             public int BinCount { get; private set; }
             public int FeatureIndex { get; private set; }
-            public AxisScaleType AxisScaleType { get; private set; }
+            public ScaleType ScaleType { get; private set; }
             public double MinValue { get; private set; }
             public double MaxValue { get; private set; }
             public double[] Counts { get; private set; } = Array.Empty<double>();
@@ -641,21 +590,21 @@ namespace Worksheet.Services
             public int RingCount { get; set; }
             public long LastProcessedSequence { get; set; }
 
-            public bool Matches(int binCount, int featureIndex, AxisScaleType axisScaleType, double minValue, double maxValue, int capacity)
+            public bool Matches(int binCount, int featureIndex, ScaleType axisScaleType, double minValue, double maxValue, int capacity)
             {
                 return BinCount == binCount
                     && FeatureIndex == featureIndex
-                    && AxisScaleType == axisScaleType
+                    && ScaleType == axisScaleType
                     && MinValue.Equals(minValue)
                     && MaxValue.Equals(maxValue)
                     && RingBins.Length == capacity;
             }
 
-            public void Reset(int binCount, int featureIndex, AxisScaleType axisScaleType, double minValue, double maxValue, int capacity)
+            public void Reset(int binCount, int featureIndex, ScaleType axisScaleType, double minValue, double maxValue, int capacity)
             {
                 BinCount = binCount;
                 FeatureIndex = featureIndex;
-                AxisScaleType = axisScaleType;
+                ScaleType = axisScaleType;
                 MinValue = minValue;
                 MaxValue = maxValue;
                 Counts = new double[binCount];
@@ -676,7 +625,7 @@ namespace Worksheet.Services
 
         private sealed class PseudocolorProcessingState
         {
-            public PseudocolorProcessingState(Guid plotId, int binCount, int xFeature, int yFeature, AxisScaleType xAxisScaleType, AxisScaleType yAxisScaleType, double minValue, double maxValue, int capacity)
+            public PseudocolorProcessingState(Guid plotId, int binCount, int xFeature, int yFeature, ScaleType xAxisScaleType, ScaleType yAxisScaleType, double minValue, double maxValue, int capacity)
             {
                 PlotId = plotId;
                 Reset(binCount, xFeature, yFeature, xAxisScaleType, yAxisScaleType, minValue, maxValue, capacity);
@@ -686,8 +635,8 @@ namespace Worksheet.Services
             public int BinCount { get; private set; }
             public int XFeature { get; private set; }
             public int YFeature { get; private set; }
-            public AxisScaleType XAxisScaleType { get; private set; }
-            public AxisScaleType YAxisScaleType { get; private set; }
+            public ScaleType XAxisScaleType { get; private set; }
+            public ScaleType YAxisScaleType { get; private set; }
             public double MinValue { get; private set; }
             public double MaxValue { get; private set; }
             public int[,] RawCounts { get; private set; } = new int[1, 1];
@@ -700,7 +649,7 @@ namespace Worksheet.Services
             public int RingCount { get; set; }
             public long LastProcessedSequence { get; set; }
 
-            public bool Matches(int binCount, int xFeature, int yFeature, AxisScaleType xAxisScaleType, AxisScaleType yAxisScaleType, double minValue, double maxValue, int capacity)
+            public bool Matches(int binCount, int xFeature, int yFeature, ScaleType xAxisScaleType, ScaleType yAxisScaleType, double minValue, double maxValue, int capacity)
             {
                 return BinCount == binCount
                     && XFeature == xFeature
@@ -712,7 +661,7 @@ namespace Worksheet.Services
                     && RingPackedBins.Length == capacity;
             }
 
-            public void Reset(int binCount, int xFeature, int yFeature, AxisScaleType xAxisScaleType, AxisScaleType yAxisScaleType, double minValue, double maxValue, int capacity)
+            public void Reset(int binCount, int xFeature, int yFeature, ScaleType xAxisScaleType, ScaleType yAxisScaleType, double minValue, double maxValue, int capacity)
             {
                 BinCount = binCount;
                 XFeature = xFeature;
@@ -754,7 +703,7 @@ namespace Worksheet.Services
 
         private sealed class SpectralRibbonProcessingState
         {
-            public SpectralRibbonProcessingState(Guid plotId, int binCount, int[] channels, int channelHash, AxisScaleType axisScaleType, double minValue, double maxValue, int capacity)
+            public SpectralRibbonProcessingState(Guid plotId, int binCount, int[] channels, int channelHash, ScaleType axisScaleType, double minValue, double maxValue, int capacity)
             {
                 PlotId = plotId;
                 Reset(binCount, channels, channelHash, axisScaleType, minValue, maxValue, capacity);
@@ -763,7 +712,7 @@ namespace Worksheet.Services
             public Guid PlotId { get; }
             public int BinCount { get; private set; }
             public int ChannelHash { get; private set; }
-            public AxisScaleType AxisScaleType { get; private set; }
+            public ScaleType ScaleType { get; private set; }
             public double MinValue { get; private set; }
             public double MaxValue { get; private set; }
             public int ChannelCount => Channels.Length;
@@ -778,22 +727,22 @@ namespace Worksheet.Services
             public int RingCount { get; set; }
             public long LastProcessedSequence { get; set; }
 
-            public bool Matches(int binCount, int channelHash, AxisScaleType axisScaleType, double minValue, double maxValue, int capacity)
+            public bool Matches(int binCount, int channelHash, ScaleType axisScaleType, double minValue, double maxValue, int capacity)
             {
                 return BinCount == binCount
                     && ChannelHash == channelHash
-                    && AxisScaleType == axisScaleType
+                    && ScaleType == axisScaleType
                     && MinValue.Equals(minValue)
                     && MaxValue.Equals(maxValue)
                     && RingRows.GetLength(0) == capacity;
             }
 
-            public void Reset(int binCount, int[] channels, int channelHash, AxisScaleType axisScaleType, double minValue, double maxValue, int capacity)
+            public void Reset(int binCount, int[] channels, int channelHash, ScaleType axisScaleType, double minValue, double maxValue, int capacity)
             {
                 BinCount = binCount;
                 Channels = channels;
                 ChannelHash = channelHash;
-                AxisScaleType = axisScaleType;
+                ScaleType = axisScaleType;
                 MinValue = minValue;
                 MaxValue = maxValue;
                 RawCounts = new int[binCount, channels.Length];

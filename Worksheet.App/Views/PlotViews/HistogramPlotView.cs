@@ -36,7 +36,7 @@ namespace Worksheet.Views.PlotViews
 
         public override PlotType PlotType => PlotType.Histogram;
 
-        public AxisScaleType CurrentAxisScale => Settings.XAxisScaleType;
+        public ScaleType CurrentAxisScale => Settings.XAxisScaleType;
 
         public override void Configure(WpfPlot plot)
         {
@@ -89,7 +89,7 @@ namespace Worksheet.Views.PlotViews
             ExecuteStaticRefresh(plot);
         }
 
-        public void UpdateAxisScale(PlotItem plotItem, AxisScaleType newScale)
+        public void UpdateAxisScale(PlotItem plotItem, ScaleType newScale)
         {
             Settings.XAxisScaleType = newScale;
         }
@@ -215,7 +215,7 @@ namespace Worksheet.Views.PlotViews
         private readonly record struct HistogramConfigSnapshot(
             int BinCount,
             int XFeature,
-            AxisScaleType XAxisScaleType,
+            ScaleType XAxisScaleType,
             double MinValue,
             double MaxValue)
         {

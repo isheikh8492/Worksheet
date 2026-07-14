@@ -4,11 +4,11 @@ using ScottPlot;
 
 namespace Worksheet.Views.PlotViews.Axes
 {
-    public class FixedLinearTickGenerator : ITickGenerator
+    public class FixedTickGenerator : ITickGenerator
     {
         private readonly Tick[] _ticks;
 
-        public FixedLinearTickGenerator(double[] majorPositions, string[] majorLabels, double[] minorPositions)
+        public FixedTickGenerator(double[] majorPositions, string[] majorLabels, double[] minorPositions)
         {
             if (majorPositions == null) throw new ArgumentNullException(nameof(majorPositions));
             if (majorLabels == null) throw new ArgumentNullException(nameof(majorLabels));

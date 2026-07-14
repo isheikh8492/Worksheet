@@ -148,7 +148,7 @@ namespace Worksheet.Views
             }
         }
 
-        public void AddPlot(PlotType plotType, AxisScaleType axisScale)
+        public void AddPlot(PlotType plotType, ScaleType axisScale)
         {
             try
             {

@@ -8,6 +8,6 @@ namespace Worksheet.Models
     {
         public override PlotType PlotType => PlotType.SpectralRibbon;
 
-        public AxisScaleType YAxisScaleType { get; set; } = AxisScaleType.Linear;
+        public ScaleType YAxisScaleType { get; set; } = ScaleType.Linear;
     }
 }

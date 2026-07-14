@@ -118,7 +118,7 @@ public sealed class ProcessingProfileTests
         {
             BinCount = 256,
             XFeature = 0,
-            XAxisScaleType = AxisScaleType.Logarithmic,
+            XAxisScaleType = ScaleType.Logarithmic,
             MinValue = 1,
             MaxValue = 100_000_000,
         };
@@ -129,8 +129,8 @@ public sealed class ProcessingProfileTests
             BinCount = 256,
             XFeature = 0,
             YFeature = 1,
-            XAxisScaleType = AxisScaleType.Logarithmic,
-            YAxisScaleType = AxisScaleType.Logarithmic,
+            XAxisScaleType = ScaleType.Logarithmic,
+            YAxisScaleType = ScaleType.Logarithmic,
             MinValue = 1,
             MaxValue = 100_000_000,
         };
@@ -139,7 +139,7 @@ public sealed class ProcessingProfileTests
         new SpectralRibbonSettings
         {
             BinCount = 256,
-            YAxisScaleType = AxisScaleType.Logarithmic,
+            YAxisScaleType = ScaleType.Logarithmic,
             MinValue = 1,
             MaxValue = 100_000_000,
         };

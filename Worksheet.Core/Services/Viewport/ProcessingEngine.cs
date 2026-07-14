@@ -327,8 +327,8 @@ namespace Worksheet.Services
             int BinCount,
             int XFeature,
             int YFeature,
-            AxisScaleType XAxisScaleType,
-            AxisScaleType YAxisScaleType,
+            ScaleType XAxisScaleType,
+            ScaleType YAxisScaleType,
             double MinValue,
             double MaxValue,
             long DataVersion)
@@ -337,7 +337,7 @@ namespace Worksheet.Services
             {
                 // Gates only attach to parameter plots (histogram, pseudocolor).
                 int binCount = 0, xFeature = 0, yFeature = 0;
-                AxisScaleType xScale = AxisScaleType.Linear, yScale = AxisScaleType.Linear;
+                ScaleType xScale = ScaleType.Linear, yScale = ScaleType.Linear;
                 double minValue = 0, maxValue = 0;
 
                 if (settings is ParameterPlotSettings parameter)

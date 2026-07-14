@@ -129,8 +129,8 @@ public sealed class DpiAwarenessTests
             BinCount = 64,
             XFeature = 0,
             YFeature = 1,
-            XAxisScaleType = AxisScaleType.Linear,
-            YAxisScaleType = AxisScaleType.Linear,
+            XAxisScaleType = ScaleType.Linear,
+            YAxisScaleType = ScaleType.Linear,
             MinValue = 1,
             MaxValue = 100,
         };
@@ -139,7 +139,7 @@ public sealed class DpiAwarenessTests
         new SpectralRibbonSettings
         {
             BinCount = 64,
-            YAxisScaleType = AxisScaleType.Linear,
+            YAxisScaleType = ScaleType.Linear,
             MinValue = 1,
             MaxValue = 100,
         };

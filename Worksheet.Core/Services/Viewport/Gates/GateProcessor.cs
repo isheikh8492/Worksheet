@@ -86,9 +86,9 @@ namespace Worksheet.Services.Viewport.Gates
             if (total <= 0)
                 return EmptyResultWithTotal(gate, settings, dataVersion, total);
 
-            var (scale, offset, isLog, effMin, effMax) = BuildBinTransform(settings, settings.XAxisScaleType);
+            Scale scale = Scale.Create(settings.XAxisScaleType, settings.MinValue, settings.MaxValue, bins);
             if (options.IncludeEventIndices)
-                return ProcessHistogramFullScan(gate, settings, dataVersion, snapshot, total, mask, scale, offset, isLog, bins, effMin, effMax);
+                return ProcessHistogramFullScan(gate, settings, dataVersion, snapshot, total, mask, scale);
 
             int geometryHash = gate.Geometry.GetGeometryHash();
             HistogramGateProcessingState state;
@@ -108,7 +108,7 @@ namespace Worksheet.Services.Viewport.Gates
             if (NeedsRebuild(state.LastProcessedSequence, snapshot))
             {
                 state.ClearData(snapshot.StartSequence);
-                ApplyHistogramRange(state, snapshot, snapshot.StartSequence, snapshot.EndSequence, mask, scale, offset, isLog, bins, effMin, effMax);
+                ApplyHistogramRange(state, snapshot, snapshot.StartSequence, snapshot.EndSequence, mask, scale);
                 state.LastProcessedSequence = snapshot.EndSequence;
             }
             else
@@ -116,7 +116,7 @@ namespace Worksheet.Services.Viewport.Gates
                 long fromSequence = state.LastProcessedSequence;
                 if (fromSequence < snapshot.EndSequence)
                 {
-                    ApplyHistogramRange(state, snapshot, fromSequence, snapshot.EndSequence, mask, scale, offset, isLog, bins, effMin, effMax);
+                    ApplyHistogramRange(state, snapshot, fromSequence, snapshot.EndSequence, mask, scale);
                     state.LastProcessedSequence = snapshot.EndSequence;
                 }
 
@@ -145,10 +145,10 @@ namespace Worksheet.Services.Viewport.Gates
             if (total <= 0)
                 return EmptyResultWithTotal(gate, settings, dataVersion, total);
 
-            var (xScale, xOffset, xIsLog, xEffMin, xEffMax) = BuildBinTransform(settings, settings.XAxisScaleType);
-            var (yScale, yOffset, yIsLog, yEffMin, yEffMax) = BuildBinTransform(settings, settings.YAxisScaleType);
+            Scale xScale = Scale.Create(settings.XAxisScaleType, settings.MinValue, settings.MaxValue, bins);
+            Scale yScale = Scale.Create(settings.YAxisScaleType, settings.MinValue, settings.MaxValue, bins);
             if (options.IncludeEventIndices)
-                return ProcessPseudocolorFullScan(gate, settings, dataVersion, snapshot, total, mask2d, xScale, xOffset, xIsLog, yScale, yOffset, yIsLog, bins, xEffMin, xEffMax, yEffMin, yEffMax);
+                return ProcessPseudocolorFullScan(gate, settings, dataVersion, snapshot, total, mask2d, xScale, yScale);
 
             int geometryHash = gate.Geometry.GetGeometryHash();
             PseudocolorGateProcessingState state;
@@ -168,7 +168,7 @@ namespace Worksheet.Services.Viewport.Gates
             if (NeedsRebuild(state.LastProcessedSequence, snapshot))
             {
                 state.ClearData(snapshot.StartSequence);
-                ApplyPseudocolorRange(state, snapshot, snapshot.StartSequence, snapshot.EndSequence, mask2d, xScale, xOffset, xIsLog, yScale, yOffset, yIsLog, bins, xEffMin, xEffMax, yEffMin, yEffMax);
+                ApplyPseudocolorRange(state, snapshot, snapshot.StartSequence, snapshot.EndSequence, mask2d, xScale, yScale);
                 state.LastProcessedSequence = snapshot.EndSequence;
             }
             else
@@ -176,7 +176,7 @@ namespace Worksheet.Services.Viewport.Gates
                 long fromSequence = state.LastProcessedSequence;
                 if (fromSequence < snapshot.EndSequence)
                 {
-                    ApplyPseudocolorRange(state, snapshot, fromSequence, snapshot.EndSequence, mask2d, xScale, xOffset, xIsLog, yScale, yOffset, yIsLog, bins, xEffMin, xEffMax, yEffMin, yEffMax);
+                    ApplyPseudocolorRange(state, snapshot, fromSequence, snapshot.EndSequence, mask2d, xScale, yScale);
                     state.LastProcessedSequence = snapshot.EndSequence;
                 }
 
@@ -201,12 +201,7 @@ namespace Worksheet.Services.Viewport.Gates
             ChannelWindowSnapshot snapshot,
             int total,
             bool[] mask,
-            double scale,
-            double offset,
-            bool isLog,
-            int bins,
-            double effMin,
-            double effMax)
+            Scale scale)
         {
             int passed = 0;
             double sum = 0;
@@ -219,7 +214,7 @@ namespace Worksheet.Services.Viewport.Gates
                 if (!double.IsFinite(value))
                     return;
 
-                int xBin = ToBin(value, scale, offset, isLog, bins, effMin, effMax);
+                int xBin = scale.ToBin(value);
                 if (!mask[xBin])
                     return;
 
@@ -248,17 +243,8 @@ namespace Worksheet.Services.Viewport.Gates
             MultiChannelWindowSnapshot snapshot,
             int total,
             bool[,] mask2d,
-            double xScale,
-            double xOffset,
-            bool xIsLog,
-            double yScale,
-            double yOffset,
-            bool yIsLog,
-            int bins,
-            double xEffMin,
-            double xEffMax,
-            double yEffMin,
-            double yEffMax)
+            Scale xScale,
+            Scale yScale)
         {
             int passed = 0;
             double sumX = 0;
@@ -274,8 +260,8 @@ namespace Worksheet.Services.Viewport.Gates
                 if (!double.IsFinite(xv) || !double.IsFinite(yv))
                     return;
 
-                int xBin = ToBin(xv, xScale, xOffset, xIsLog, bins, xEffMin, xEffMax);
-                int yBin = ToBin(yv, yScale, yOffset, yIsLog, bins, yEffMin, yEffMax);
+                int xBin = xScale.ToBin(xv);
+                int yBin = yScale.ToBin(yv);
                 if (!mask2d[yBin, xBin])
                     return;
 
@@ -400,12 +386,7 @@ namespace Worksheet.Services.Viewport.Gates
             long fromSequence,
             long toSequence,
             bool[] mask,
-            double scale,
-            double offset,
-            bool isLog,
-            int bins,
-            double effMin,
-            double effMax)
+            Scale scale)
         {
             for (long sequence = fromSequence; sequence < toSequence; sequence++)
             {
@@ -418,7 +399,7 @@ namespace Worksheet.Services.Viewport.Gates
 
                 if (double.IsFinite(value))
                 {
-                    int xBin = ToBin(value, scale, offset, isLog, bins, effMin, effMax);
+                    int xBin = scale.ToBin(value);
                     passed = mask[xBin];
                 }
 
@@ -463,17 +444,8 @@ namespace Worksheet.Services.Viewport.Gates
             long fromSequence,
             long toSequence,
             bool[,] mask2d,
-            double xScale,
-            double xOffset,
-            bool xIsLog,
-            double yScale,
-            double yOffset,
-            bool yIsLog,
-            int bins,
-            double xEffMin,
-            double xEffMax,
-            double yEffMin,
-            double yEffMax)
+            Scale xScale,
+            Scale yScale)
         {
             for (long sequence = fromSequence; sequence < toSequence; sequence++)
             {
@@ -487,8 +459,8 @@ namespace Worksheet.Services.Viewport.Gates
 
                 if (double.IsFinite(xv) && double.IsFinite(yv))
                 {
-                    int xBin = ToBin(xv, xScale, xOffset, xIsLog, bins, xEffMin, xEffMax);
-                    int yBin = ToBin(yv, yScale, yOffset, yIsLog, bins, yEffMin, yEffMax);
+                    int xBin = xScale.ToBin(xv);
+                    int yBin = yScale.ToBin(yv);
                     passed = mask2d[yBin, xBin];
                 }
 
@@ -658,40 +630,6 @@ namespace Worksheet.Services.Viewport.Gates
             return inside;
         }
 
-        private static (double scale, double offset, bool isLog, double effMin, double effMax) BuildBinTransform(
-            ParameterPlotSettings settings, AxisScaleType scaleType)
-        {
-            double min = settings.MinValue;
-            double max = settings.MaxValue;
-            int bins = settings.GetBinCount();
-
-            if (scaleType == AxisScaleType.Logarithmic)
-            {
-                if (min < 1) min = 1;
-                if (max <= min) max = min * 10;
-                double minLog = Math.Log10(min);
-                double maxLog = Math.Log10(max);
-                double scale = bins / (maxLog - minLog);
-                double offset = -minLog * scale;
-                return (scale, offset, true, min, max);
-            }
-
-            if (max <= min) max = min + 1;
-            double linearScale = bins / (max - min);
-            double linearOffset = -min * linearScale;
-            return (linearScale, linearOffset, false, min, max);
-        }
-
-        private static int ToBin(double value, double scale, double offset, bool isLog,
-            int bins, double effMin, double effMax)
-        {
-            if (value < effMin) value = effMin;
-            else if (value > effMax) value = effMax;
-
-            double pos = isLog ? Math.Log10(value) * scale + offset : value * scale + offset;
-            return Math.Clamp((int)pos, 0, bins - 1);
-        }
-
         private static bool NeedsRebuild(long lastProcessedSequence, ChannelWindowSnapshot snapshot)
         {
             if (lastProcessedSequence == 0)
@@ -774,7 +712,7 @@ namespace Worksheet.Services.Viewport.Gates
             public int GeometryHash { get; private set; }
             public int BinCount { get; private set; }
             public int FeatureIndex { get; private set; }
-            public AxisScaleType AxisScaleType { get; private set; }
+            public ScaleType ScaleType { get; private set; }
             public double MinValue { get; private set; }
             public double MaxValue { get; private set; }
             public bool[] RingPassed { get; private set; } = Array.Empty<bool>();
@@ -791,7 +729,7 @@ namespace Worksheet.Services.Viewport.Gates
                 return GeometryHash == geometryHash
                     && BinCount == settings.GetBinCount()
                     && FeatureIndex == settings.XFeature
-                    && AxisScaleType == settings.XAxisScaleType
+                    && ScaleType == settings.XAxisScaleType
                     && MinValue.Equals(settings.MinValue)
                     && MaxValue.Equals(settings.MaxValue)
                     && RingPassed.Length == capacity;
@@ -802,7 +740,7 @@ namespace Worksheet.Services.Viewport.Gates
                 GeometryHash = geometryHash;
                 BinCount = settings.GetBinCount();
                 FeatureIndex = settings.XFeature;
-                AxisScaleType = settings.XAxisScaleType;
+                ScaleType = settings.XAxisScaleType;
                 MinValue = settings.MinValue;
                 MaxValue = settings.MaxValue;
                 RingPassed = new bool[capacity];
@@ -839,8 +777,8 @@ namespace Worksheet.Services.Viewport.Gates
             public int BinCount { get; private set; }
             public int XFeature { get; private set; }
             public int YFeature { get; private set; }
-            public AxisScaleType XAxisScaleType { get; private set; }
-            public AxisScaleType YAxisScaleType { get; private set; }
+            public ScaleType XAxisScaleType { get; private set; }
+            public ScaleType YAxisScaleType { get; private set; }
             public double MinValue { get; private set; }
             public double MaxValue { get; private set; }
             public bool[] RingPassed { get; private set; } = Array.Empty<bool>();

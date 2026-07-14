@@ -5,14 +5,14 @@ namespace Worksheet.Views.PlotViews.Dialogs
 {
     public partial class HistogramPropertiesDialog : Window
     {
-        public AxisScaleType SelectedAxisScale { get; private set; }
+        public ScaleType SelectedAxisScale { get; private set; }
         public int SelectedChannelIndex { get; private set; }
 
-        public HistogramPropertiesDialog(AxisScaleType currentScale, System.Collections.Generic.IReadOnlyList<string> channelNames, int currentChannelIndex)
+        public HistogramPropertiesDialog(ScaleType currentScale, System.Collections.Generic.IReadOnlyList<string> channelNames, int currentChannelIndex)
         {
             InitializeComponent();
 
-            AxisScaleComboBox.ItemsSource = new[] { AxisScaleType.Linear, AxisScaleType.Logarithmic };
+            AxisScaleComboBox.ItemsSource = new[] { ScaleType.Linear, ScaleType.Logarithmic };
             AxisScaleComboBox.SelectedItem = currentScale;
 
             ChannelComboBox.ItemsSource = channelNames;
@@ -28,7 +28,7 @@ namespace Worksheet.Views.PlotViews.Dialogs
 
         private void Ok_Click(object sender, RoutedEventArgs e)
         {
-            if (AxisScaleComboBox.SelectedItem is AxisScaleType selected && ChannelComboBox.SelectedIndex >= 0)
+            if (AxisScaleComboBox.SelectedItem is ScaleType selected && ChannelComboBox.SelectedIndex >= 0)
             {
                 SelectedAxisScale = selected;
                 SelectedChannelIndex = ChannelComboBox.SelectedIndex;

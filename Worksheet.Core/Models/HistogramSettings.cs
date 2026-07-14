@@ -8,6 +8,6 @@ namespace Worksheet.Models
         public override PlotType PlotType => PlotType.Histogram;
 
         public int XFeature { get; set; }
-        public AxisScaleType XAxisScaleType { get; set; } = AxisScaleType.Linear;
+        public ScaleType XAxisScaleType { get; set; } = ScaleType.Linear;
     }
 }

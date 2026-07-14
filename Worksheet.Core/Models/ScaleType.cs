@@ -1,6 +1,6 @@
 namespace Worksheet.Models
 {
-    public enum AxisScaleType
+    public enum ScaleType
     {
         Linear,
         Logarithmic

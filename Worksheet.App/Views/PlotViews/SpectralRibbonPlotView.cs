@@ -111,7 +111,7 @@ namespace Worksheet.Views.PlotViews
             for (int i = 0; i <= channelCount; i++)
                 minorPositions[i] = i;
 
-            var tickGen = new FixedLinearTickGenerator(
+            var tickGen = new FixedTickGenerator(
                 positions,
                 labels,
                 minorPositions);
@@ -136,12 +136,12 @@ namespace Worksheet.Views.PlotViews
         {
             switch (Settings.YAxisScaleType)
             {
-                case AxisScaleType.Linear:
+                case ScaleType.Linear:
                     plot.Plot.Axes.Left.TickGenerator = LinearAxisItem.CreateDataTickGenerator(Settings);
                     if (resetLimits)
                         plot.Plot.Axes.SetLimitsY(0, bins);
                     break;
-                case AxisScaleType.Logarithmic:
+                case ScaleType.Logarithmic:
                     plot.Plot.Axes.Left.TickGenerator = LogarithmicAxisItem.CreateDataTickGenerator(Settings);
                     if (resetLimits)
                         plot.Plot.Axes.SetLimitsY(0, bins);
@@ -154,7 +154,7 @@ namespace Worksheet.Views.PlotViews
         private readonly record struct SpectralConfigSnapshot(
             int Bins,
             int ChannelCount,
-            AxisScaleType YAxisScaleType,
+            ScaleType YAxisScaleType,
             double MinValue,
             double MaxValue)
         {

@@ -17,7 +17,7 @@ namespace Worksheet.Views.PlotViews.Axes
             for (int i = 0; i < labels.Length; i++)
                 labels[i] = FormatTickLabel(NormalizedTickPositions[i] * upperBound);
 
-            plot.Plot.Axes.Left.TickGenerator = new FixedLinearTickGenerator(
+            plot.Plot.Axes.Left.TickGenerator = new FixedTickGenerator(
                 NormalizedTickPositions,
                 labels,
                 NormalizedMinorTickPositions);

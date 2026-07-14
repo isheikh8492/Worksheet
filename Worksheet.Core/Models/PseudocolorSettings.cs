@@ -10,7 +10,7 @@ namespace Worksheet.Models
 
         public int XFeature { get; set; }
         public int YFeature { get; set; }
-        public AxisScaleType XAxisScaleType { get; set; } = AxisScaleType.Linear;
-        public AxisScaleType YAxisScaleType { get; set; } = AxisScaleType.Linear;
+        public ScaleType XAxisScaleType { get; set; } = ScaleType.Linear;
+        public ScaleType YAxisScaleType { get; set; } = ScaleType.Linear;
     }
 }
